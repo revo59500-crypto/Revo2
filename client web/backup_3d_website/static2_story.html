@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE | Our Story</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --acid-lemon: #ccff00;
+            --hot-magenta: #ff007a;
+            --void-black: #050505;
+        }
+
+        body {
+            margin: 0; padding: 0; background-color: var(--void-black);
+            font-family: 'Space Grotesk', sans-serif; color: white;
+            overflow-x: hidden;
+        }
+
+        /* Nav */
+        nav { padding: 40px 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; width: 90%; z-index: 100; mix-blend-mode: difference; }
+        .logo { font-family: 'Syncopate'; font-size: 1.5rem; color: var(--acid-lemon); text-decoration: none; }
+        .back-btn { color: white; text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; }
+
+        /* Story Layout */
+        .story-hero { height: 100vh; display: flex; align-items: center; justify-content: center; position: relative; }
+        
+        .glow-orb {
+            position: absolute; width: 600px; height: 600px; background: var(--hot-magenta);
+            filter: blur(200px); opacity: 0.3; border-radius: 50%; z-index: 0;
+            animation: pulse 5s infinite alternate;
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.2; } 100% { transform: scale(1.2); opacity: 0.4; } }
+
+        .content { z-index: 10; max-width: 800px; padding: 0 5%; }
+        
+        h1 { font-family: 'Syncopate'; font-size: clamp(2.5rem, 6vw, 5rem); margin-bottom: 30px; line-height: 1.1; }
+        .highlight { color: var(--hot-magenta); }
+
+        p { font-size: 1.2rem; line-height: 1.8; margin-bottom: 20px; color: rgba(255,255,255,0.8); }
+
+        .timeline { margin-top: 80px; border-left: 2px solid rgba(255,255,255,0.1); padding-left: 30px; }
+        .year { font-family: 'Syncopate'; color: var(--acid-lemon); font-size: 1.5rem; margin-bottom: 10px; }
+        .timeline-block { margin-bottom: 50px; position: relative; }
+        .timeline-block::before {
+            content: ''; position: absolute; left: -36px; top: 5px; width: 10px; height: 10px;
+            background: var(--acid-lemon); border-radius: 50%; box-shadow: 0 0 10px var(--acid-lemon);
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'services-static' %}" class="logo">PULSE.</a>
+        <a href="{% url 'services-static' %}" class="back-btn">RETURN</a>
+    </nav>
+
+    <section class="story-hero">
+        <div class="glow-orb"></div>
+        <div class="content">
+            <h1>WE GOT TIRED OF <span class="highlight">BORING SODA.</span></h1>
+            <p>In 2026, the beverage aisle looked exactly like it did in 1996. Same sticky syrups, same corporate brands, same sluggish feeling after you drank one.</p>
+            <p>Pulse was built in a garage by three web developers who needed a clean, sustained energy source to code through the night. We treated hydration like software: we debugged the sugar crashes, optimized the flavor profiles, and deployed the final build.</p>
+            
+            <div class="timeline">
+                <div class="timeline-block">
+                    <div class="year">V 1.0</div>
+                    <p>The first batch of Cyber Lime is formulated. We gave it away at local hackathons. It disappeared in minutes.</p>
+                </div>
+                <div class="timeline-block">
+                    <div class="year">V 2.0</div>
+                    <p>We switched to 100% sustainable aluminum and finalized the cryo-extraction process, achieving the signature "Snap."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

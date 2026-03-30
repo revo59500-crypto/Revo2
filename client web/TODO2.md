@@ -1,0 +1,2 @@
+# Fix Login/Signup Redirects & Form Submission\n\n## Steps:\n- [x] 1. Update views.py: Fix redirect('home') → redirect('index'), signup render template to 'signup.html'\n- [x] 2. Create webbase/allpg/templates/signup_form.html with real Django form (renamed for consistency)\n- [ ] 3. Restart server: cd webbase && python manage.py runserver\n- [ ] 4. Create test user: cd webbase && python manage.py createsuperuser\n- [ ] 5. Test login/signup → redirect to index.html with success message\n\n**Note**: Update views.py signup render to 'signup_form.html' if needed.
+

@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% block title %}WebGL / 3D Design - REVO{% endblock title %}
+
+{% block body %}
+<style>
+    /* REVO 3D SPACE THEME */
+    #webgl-container {
+        position: relative;
+        min-height: 100vh;
+        background: radial-gradient(ellipse at center, rgba(0,20,40,0.8) 0%, #000 70%);
+        overflow: hidden;
+    }
+
+    #three-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .content-overlay {
+        position: relative;
+        z-index: 10;
+        backdrop-filter: blur(20px);
+        background: rgba(5, 10, 20, 0.6);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        min-height: 100vh;
+        padding: 8rem 5% 4rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .revo-gradient-text {
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #b764ff 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        text-shadow: 0 0 40px rgba(0, 242, 254, 0.5);
+    }
+
+    .glass-card {
+        background: rgba(15, 20, 30, 0.7);
+        backdrop-filter: blur(25px);
+        border: 1px solid rgba(0, 242, 254, 0.15);
+        border-radius: 24px;
+        padding: 3rem;
+        margin: 2rem 0;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 242, 254, 0.05);
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2.5rem;
+        margin: 4rem 0;
+    }
+
+    .feature-item {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 20px;
+        background: linear-gradient(145deg, rgba(0,242,254,0.1), rgba(183,100,255,0.1));
+        border: 1px solid rgba(0,242,254,0.2);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .feature-item:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 0 30px 80px rgba(0,242,254,0.3);
+        border-color: rgba(0,242,254,0.6);
+    }
+
+    .feature-icon {
+        font-size: 4rem;
+        background: linear-gradient(135deg, #00f2fe, #b764ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 25px rgba(0,242,254,0.6));
+        margin-bottom: 1.5rem;
+    }
+
+    .cta-button {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.2rem;
+        font-weight: 700;
+        border-radius: 50px;
+        color: #000;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 30px rgba(0,242,254,0.4);
+    }
+
+    .cta-button:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 50px rgba(0,242,254,0.6);
+    }
+
+    @media (max-width: 768px) {
+        .content-overlay { padding: 6rem 5% 2rem; }
+        .glass-card { padding: 2rem; margin: 1rem 0; }
+    }
+</style>
+
+<!-- THREE.JS INTERACTIVE 3D SCENE -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<div id="three-canvas"></div>
+
+<div class="content-overlay">
+    <div class="container">
+        <!-- HERO SECTION -->
+        <div class="text-center mb-8">
+            <h6 class="text-info mb-3 fs-5"><i class="fas fa-cube me-2"></i> EVENT HORIZON ENGAGED</h6>
+            <h1 class="display-2 revo-gradient-text mb-4 fw-bold">WebGL / 3D Universes</h1>
+            <p class="lead text-light opacity-90 mb-5" style="max-width: 800px; margin: auto; font-size: 1.3rem;">
+                We don't build websites. We engineer <strong>antigravity digital realms</strong> where your brand becomes a living, breathing 3D universe.
+            </p>
+            <a href="/contact/" class="cta-button mb-5">
+                <i class="fas fa-rocket me-2"></i> DEPLOY 3D REALM
+            </a>
+        </div>
+
+        <!-- FEATURES GRID -->
+        <div class="feature-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🌀</div>
+                <h3 class="text-white fw-bold mb-3">Real-Time 3D Rendering</h3>
+                <p class="text-light opacity-85 mb-0">
+                    WebGL-powered environments running at 60fps. Infinite detail levels, real-time lighting, shadows, and physics simulations directly in the browser.
+                </p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎮</div>
+                <h3 class="text-white fw-bold mb-3">Interactive 3D Experiences</h3>
+                <p class="text-light opacity-85 mb-0">
+                    Mouse/touch controls, drag-to-rotate, zoom interactions. Users explore your brand in true 3D space with physics-based animations and particle systems.
+                </p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <h3 class="text-white fw-bold mb-3">Performance Optimized</h3>
+                <p class="text-light opacity-85 mb-0">
+                    LOD systems, occlusion culling, GPU instancing. 3D experiences that run smoothly on mobile, tablet, desktop—even older hardware.
+                </p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🌌</div>
+                <h3 class="text-white fw-bold mb-3">Custom Shaders & FX</h3>
+                <p class="text-light opacity-85 mb-0">
+                    GLSL fragment shaders for impossible visuals: procedural planets, holographic UI, gravitational lensing, volumetric lighting, bloom effects.
+                </p>
+            </div>
+        </div>
+
+        <!-- PROCESS SECTION -->
+        <div class="glass-card text-center">
+            <h2 class="revo-gradient-text display-5 fw-bold mb-5">3D Deployment Matrix</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="p-4">
+                        <span class="display-4 text-info">01</span>
+                        <h4 class="text-white mt-3 mb-3">Mesh Modeling</h4>
+                        <p class="text-light opacity-80">Low-poly to high-poly asset creation optimized for WebGL rendering pipelines.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4">
+                        <span class="display-4" style="color: #4facfe;">02</span>
+                        <h4 class="text-white mt-3 mb-3">Shader Engineering</h4>
+                        <p class="text-light opacity-80">Custom GLSL materials with physically-based rendering and post-processing stacks.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4">
+                        <span class="display-4" style="color: #b764ff;">03</span>
+                        <h4 class="text-white mt-3 mb-3">Scene Optimization</h4>
+                        <p class="text-light opacity-80">Lightmapping, compression, and LOD implementation for cross-device compatibility.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // THREE.JS INTERACTIVE 3D GLOBE / NEBULA
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x000428, 0.0025);
+    
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+    
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    document.getElementById('three-canvas').appendChild(renderer.domElement);
+    
+    // Floating Particles / Nebula
+    const particleGeometry = new THREE.BufferGeometry();
+    const particleCount = 5000;
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    const sizes = new Float32Array(particleCount);
+    
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        positions[i3] = (Math.random() - 0.5) * 10;
+        positions[i3 + 1] = (Math.random() - 0.5) * 10;
+        positions[i3 + 2] = (Math.random() - 0.5) * 10;
+        
+        // Cyan-purple nebula colors
+        colors[i3] = 0.0; colors[i3 + 1] = 0.8 + Math.random() * 0.4; colors[i3 + 2] = 0.6 + Math.random() * 0.6;
+        sizes[i] = Math.random() * 3 + 1;
+    }
+    
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    particleGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    
+    const particleMaterial = new THREE.PointsMaterial({
+        size: 0.1,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending
+    });
+    
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
+    
+    // Rotating Icosahedron (Brand Orb)
+    const icoGeometry = new THREE.IcosahedronGeometry(0.8, 1);
+    const icoMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0x00f2fe,
+        metalness: 0.9,
+        roughness: 0.1,
+        transmission: 0.3,
+        thickness: 0.5,
+        clearcoat: 1.0
+    });
+    const icosahedron = new THREE.Mesh(icoGeometry, icoMaterial);
+    scene.add(icosahedron);
+    
+    // Animation Loop
+    let time = 0;
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.01;
+        
+        // Rotate everything slowly
+        particles.rotation.y += 0.002;
+        icosahedron.rotation.x += 0.005;
+        icosahedron.rotation.y += 0.008;
+        
+        // Pulsing nebula
+        particleMaterial.opacity = 0.6 + Math.sin(time * 3) * 0.2;
+        
+        camera.position.x = Math.sin(time * 0.3) * 0.5;
+        camera.position.y = Math.cos(time * 0.3) * 0.3;
+        camera.lookAt(0, 0, 0);
+        
+        renderer.render(scene, camera);
+    }
+    animate();
+    
+    // Resize handler
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+});
+</script>
+{% endblock %}

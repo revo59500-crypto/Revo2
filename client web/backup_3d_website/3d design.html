@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Enterprise Spatial Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           1. CORE VARIABLES & GLOBAL STYLES
+           ========================================= */
+        :root {
+            --bg-base: #02000a;
+            --surface-glass: rgba(255, 255, 255, 0.03);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #FFFFFF;
+            --text-secondary: #8b949e;
+            
+            /* Neon Accents */
+            --neon-blue: #00f0ff;
+            --neon-purple: #b026ff;
+            --neon-pink: #ff0055;
+            
+            --gradient-text: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            
+            --sidebar-width: 300px;
+            
+            /* 3D Variables mapped to mouse */
+            --mouse-x: 0deg;
+            --mouse-y: 0deg;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-base); }
+        ::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-purple); }
+
+        /* =========================================
+           2. ANIMATED BACKGROUND
+           ========================================= */
+        .bg-orbs {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(140px);
+            opacity: 0.4;
+            animation: float 25s infinite alternate ease-in-out;
+        }
+        
+        .orb-1 { width: 600px; height: 600px; background: var(--neon-purple); top: -10%; left: -10%; }
+        .orb-2 { width: 500px; height: 500px; background: var(--neon-blue); bottom: -20%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 400px; height: 400px; background: var(--neon-pink); top: 40%; left: 30%; animation-delay: -10s; opacity: 0.2;}
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(150px, 100px) scale(1.2); }
+        }
+
+        /* =========================================
+           3. FLOATING SIDEBAR
+           ========================================= */
+        .sidebar-wrapper {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            padding: 2rem;
+            z-index: 100;
+        }
+
+        .sidebar {
+            background: var(--surface-glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 2.5rem 1.5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 3rem;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-list { list-style: none; overflow-y: auto; flex-grow: 1; }
+        .nav-list::-webkit-scrollbar { display: none; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 14px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--gradient-text); opacity: 0; transition: opacity 0.4s ease; z-index: -1;
+        }
+
+        .nav-link:hover { color: #fff; transform: translateX(8px); }
+        
+        .nav-link.active {
+            color: #fff; font-weight: 700;
+            box-shadow: 0 10px 25px -5px rgba(176, 38, 255, 0.3);
+        }
+        .nav-link.active::before { opacity: 0.15; }
+
+        /* =========================================
+           4. MAIN CONTENT LAYOUT
+           ========================================= */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 0 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6rem 0;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Typography */
+        .tagline {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-blue);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 2rem;
+            width: fit-content;
+        }
+
+        h1 {
+            font-size: 5.5rem;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 2rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { font-size: 3rem; font-weight: 800; margin-bottom: 1.5rem; letter-spacing: -1px; }
+        
+        p.lead {
+            font-size: 1.5rem;
+            color: #c9d1d9;
+            max-width: 800px;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        /* =========================================
+           5. SECTION 1: THE 3D CSS MASTERPIECE
+           ========================================= */
+        #hero {
+            position: relative;
+            align-items: center; /* Center the 3D scene */
+        }
+
+        .hero-text {
+            position: absolute;
+            top: 15%;
+            left: 0;
+            z-index: 20;
+            pointer-events: none; /* Let mouse pass through to 3D cube */
+        }
+
+        .scene-container {
+            width: 100%;
+            height: 70vh;
+            perspective: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5rem;
+        }
+
+        .universe {
+            position: relative;
+            width: 25vmin;
+            height: 25vmin;
+            transform-style: preserve-3d;
+            transform: rotateX(calc(var(--mouse-y) - 15deg)) rotateY(calc(var(--mouse-x) + 30deg)) translate3d(0, 0, 0);
+            animation: spinUniverse 25s infinite linear;
+        }
+
+        @keyframes spinUniverse {
+            0% { transform: rotateX(calc(var(--mouse-y) - 15deg)) rotateY(calc(var(--mouse-x) + 30deg)) rotateZ(0deg); }
+            100% { transform: rotateX(calc(var(--mouse-y) - 15deg)) rotateY(calc(var(--mouse-x) + 30deg)) rotateZ(360deg); }
+        }
+
+        .cube {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .face {
+            position: absolute;
+            width: 25vmin;
+            height: 25vmin;
+            background: rgba(0, 240, 255, 0.05);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1) inset;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2.5vmin;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            backface-visibility: visible; 
+            backdrop-filter: blur(5px);
+            transition: all 0.4s ease;
+        }
+
+        .face:hover {
+            background: rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 50px rgba(0, 240, 255, 0.6) inset, 0 0 30px var(--neon-blue);
+            cursor: crosshair;
+        }
+
+        .front  { transform: rotateY(0deg) translateZ(12.5vmin); }
+        .back   { transform: rotateY(180deg) translateZ(12.5vmin); }
+        .right  { transform: rotateY(90deg) translateZ(12.5vmin); }
+        .left   { transform: rotateY(-90deg) translateZ(12.5vmin); }
+        .top    { transform: rotateX(90deg) translateZ(12.5vmin); }
+        .bottom { transform: rotateX(-90deg) translateZ(12.5vmin); }
+
+        /* Orbiting 3D Data Panels */
+        .orbit-system {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform-style: preserve-3d;
+        }
+
+        .panel-3d {
+            position: absolute;
+            width: 20vmin;
+            height: 12vmin;
+            background: rgba(176, 38, 255, 0.1);
+            border: 1px solid var(--neon-purple);
+            top: -6vmin; left: -10vmin;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backface-visibility: hidden; 
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .panel-3d h3 { color: #fff; font-size: 1.8vmin; margin-bottom: 5px; text-transform: uppercase;}
+        .panel-3d p { color: var(--neon-purple); font-size: 1.2vmin; }
+
+        .panel-1 { transform: rotateY(0deg) translate3d(0, 0, 35vmin); }
+        .panel-2 { transform: rotateY(72deg) translate3d(0, 0, 35vmin); }
+        .panel-3 { transform: rotateY(144deg) translate3d(0, 0, 35vmin); }
+        .panel-4 { transform: rotateY(216deg) translate3d(0, 0, 35vmin); }
+        .panel-5 { transform: rotateY(288deg) translate3d(0, 0, 35vmin); }
+
+        .panel-3d:hover {
+            cursor: pointer;
+            box-shadow: 0 0 40px var(--neon-purple);
+            background: rgba(176, 38, 255, 0.3);
+        }
+        
+        .panel-1:hover { transform: rotateY(0deg) translate3d(0, 0, 42vmin) scale3d(1.3, 1.3, 1.3); }
+        .panel-2:hover { transform: rotateY(72deg) translate3d(0, 0, 42vmin) scale3d(1.3, 1.3, 1.3); }
+        .panel-3:hover { transform: rotateY(144deg) translate3d(0, 0, 42vmin) scale3d(1.3, 1.3, 1.3); }
+        .panel-4:hover { transform: rotateY(216deg) translate3d(0, 0, 42vmin) scale3d(1.3, 1.3, 1.3); }
+        .panel-5:hover { transform: rotateY(288deg) translate3d(0, 0, 42vmin) scale3d(1.3, 1.3, 1.3); }
+
+        /* The Matrix3D Flex */
+        .matrix-badge {
+            position: absolute;
+            top: -12.5vmin; left: -12.5vmin;
+            width: 25vmin; height: 25vmin;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; text-align: center;
+            color: rgba(255,255,255,0.5); font-weight: bold; font-size: 1.5vmin;
+            font-family: 'Rajdhani', sans-serif;
+            pointer-events: none;
+            transform: matrix3d(1, 0.5, 0, 0, -0.2, 1, 0, 0, 0, 0, 1, 0, 0, 0, 50, 1);
+            animation: pulseMatrix 4s infinite alternate;
+        }
+
+        @keyframes pulseMatrix {
+            to { transform: matrix3d(1.2, -0.2, 0, 0, 0.5, 1.2, 0, 0, 0, 0, 1, 0, 0, 0, 100, 1); }
+        }
+
+        /* =========================================
+           6. BENTO GRID SECTIONS (Data UI)
+           ========================================= */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .span-2 { grid-column: span 2; }
+        .span-3 { grid-column: span 3; }
+        .row-span-2 { grid-row: span 2; }
+
+        .card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--surface-border);
+            border-radius: 24px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            /* Scroll Animation Hidden State */
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        /* Scroll Reveal Class applied via JS */
+        .card.reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 40px rgba(176, 38, 255, 0.1);
+        }
+
+        .card h3 { font-size: 1.8rem; margin-bottom: 1rem; font-weight: 700; color: #fff;}
+        .card p { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.7; }
+        .card .stat { 
+            font-size: 4.5rem; 
+            font-weight: 900; 
+            background: var(--gradient-text); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin-bottom: 0.5rem; 
+            line-height: 1;
+        }
+
+        /* =========================================
+           7. RESPONSIVE DESIGN
+           ========================================= */
+        @media (max-width: 1200px) { 
+            .bento-grid { grid-template-columns: repeat(2, 1fr); } 
+            .span-3 { grid-column: span 2; } 
+            h1 { font-size: 4.5rem; } 
+        }
+        
+        @media (max-width: 900px) {
+            .sidebar-wrapper { width: 100%; height: auto; padding: 1rem; bottom: 0; top: auto; }
+            .sidebar { padding: 1rem; flex-direction: row; border-radius: 16px; overflow-x: auto;}
+            .logo { display: none; }
+            .nav-list { display: flex; gap: 1rem; margin: 0; padding: 0;}
+            .nav-link { padding: 0.5rem 1rem; white-space: nowrap; margin: 0;}
+            .main-content { margin-left: 0; padding: 1rem 2rem 6rem 2rem; }
+            .bento-grid { grid-template-columns: 1fr; }
+            .span-2, .span-3, .row-span-2 { grid-column: span 1; grid-row: span 1; }
+            h1 { font-size: 3.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="sidebar-wrapper">
+        <aside class="sidebar">
+            <div class="logo">REV<span>O</span></div>
+            <ul class="nav-list">
+                <li><a href="#hero" class="nav-link active">01. Spatial Core</a></li>
+                <li><a href="#intelligence" class="nav-link">02. Intelligence</a></li>
+                <li><a href="#capabilities" class="nav-link">03. Capabilities</a></li>
+                <li><a href="#telemetry" class="nav-link">04. Telemetry</a></li>
+                
+            </ul>
+        </aside>
+    </div>
+
+    <main class="main-content">
+        
+        <section id="hero">
+            <div class="hero-text">
+                <div class="tagline">System Architecture v3.0</div>
+                <h1>Pure CSS<br>Spatial DOM.</h1>
+                <p class="lead" style="max-width: 600px;">No Canvas. No WebGL. 100% native DOM nodes manipulated through advanced matrix mathematics and hardware acceleration.</p>
+            </div>
+
+            <div class="scene-container">
+                <div class="universe">
+                    <div class="matrix-badge">MATRIX3D ENGINE</div>
+
+                    <div class="cube">
+                        <div class="face front">Scale3D</div>
+                        <div class="face back">Translate3D</div>
+                        <div class="face right">Rotate3D</div>
+                        <div class="face left">Perspective</div>
+                        <div class="face top">Matrix3D</div>
+                        <div class="face bottom">Preserve-3D</div>
+                    </div>
+
+                    <div class="orbit-system">
+                        <div class="panel-3d panel-1"><h3>Data Node 01</h3><p>Backface: Hidden</p></div>
+                        <div class="panel-3d panel-2"><h3>Data Node 02</h3><p>Z-Index Mapping</p></div>
+                        <div class="panel-3d panel-3"><h3>Data Node 03</h3><p>Spatial Render</p></div>
+                        <div class="panel-3d panel-4"><h3>Data Node 04</h3><p>DOM Extrusion</p></div>
+                        <div class="panel-3d panel-5"><h3>Data Node 05</h3><p>Hardware Accel.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="intelligence">
+            <div class="tagline">Entity Origin</div>
+            <h2>Born from data. Built for scale.</h2>
+            <p class="lead">We dismantle monolithic inefficiencies and replace them with modular, highly cohesive data structures.</p>
+            
+            <div class="bento-grid">
+                <div class="card span-2" style="background: rgba(176, 38, 255, 0.05); border-color: rgba(176, 38, 255, 0.3);">
+                    <h3 style="color: var(--neon-purple);">Prime Directive</h3>
+                    <p>To eliminate technical debt. Most enterprise architectures are tangled webs of legacy code. We engineer pipelines that scale infinitely.</p>
+                    <br>
+                    <p style="color: #fff; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px;">[ PROTOCOL: AES-256 ENCRYPTION ACTIVE ]</p>
+                </div>
+                <div class="card">
+                    <div class="stat" style="font-size: 3rem;">450+</div>
+                    <h3>Global Nodes</h3>
+                    <p>Edge rendering across 40 global CDN zones.</p>
+                </div>
+                <div class="card">
+                    <div class="stat" style="font-size: 3rem;">99.9%</div>
+                    <h3>Uptime SLA</h3>
+                    <p>Redundant serverless architecture guarantee.</p>
+                </div>
+                <div class="card span-2">
+                    <h3>Beyond Standard Rendering</h3>
+                    <p>Notice the fluidity of this single-page app? By utilizing virtual DOM manipulations, intersection observers, and CSS keyframes, we ensure that your users experience applications that feel native, responsive, and alive.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="capabilities">
+            <div class="tagline">Execution Matrix</div>
+            <h2>Full-Spectrum Engineering.</h2>
+            <p class="lead">A specialized strike team for your toughest technical bottlenecks.</p>
+            
+            <div class="bento-grid">
+                <div class="card">
+                    <h3>Cloud Native Computing</h3>
+                    <p>AWS, GCP, and Azure migrations utilizing Docker containers and Kubernetes orchestration for auto-scaling deployments.</p>
+                </div>
+                <div class="card">
+                    <h3>Generative AI Integration</h3>
+                    <p>Custom LLM training and RAG pipelines for internal enterprise knowledge bases, reducing support overhead by 40%.</p>
+                </div>
+                <div class="card">
+                    <h3>High-Frequency Finance</h3>
+                    <p>Sub-millisecond trading dashboards and automated risk-assessment pipelines. For when a microsecond delay is unacceptable.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="telemetry">
+            <div class="tagline">Data Driven</div>
+            <h2>We let the math do the talking.</h2>
+            
+            <div class="bento-grid">
+                <div class="card">
+                    <div class="stat">+400%</div>
+                    <h3>User Retention</h3>
+                    <p>Achieved for MediCore Health app post UX structural redesign.</p>
+                </div>
+                <div class="card">
+                    <div class="stat">-85%</div>
+                    <h3>Server Costs</h3>
+                    <p>Optimized via AWS Lambda and edge-computing implementation.</p>
+                </div>
+                <div class="card">
+                    <div class="stat">1.2s</div>
+                    <h3>Time to Interactive</h3>
+                    <p>Average global load time across our enterprise SPA platforms.</p>
+                </div>
+                <div class="card span-3" style="border-left: 4px solid var(--neon-blue);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>Project: OMNI-RETAIL</h3>
+                        <span style="color: var(--neon-blue); font-weight: bold; font-family: 'Rajdhani', sans-serif;">[ CLASSIFIED / CLEARED ]</span>
+                    </div>
+                    <p><strong>Challenge:</strong> A global fashion retailer's monolith architecture crashed during Black Friday, losing an estimated $12M an hour.</p>
+                    <p style="margin-top: 0.5rem;"><strong>Solution & Result:</strong> Transitioned to Headless Commerce in 4 months. 0 downtime the following year. 300% faster page loads.</p>
+                </div>
+            </div>
+        </section>
+
+
+    </main>
+
+    <script>
+        // --- 1. MOUSE TRACKING FOR 3D CSS CORE ---
+        // Links the mouse movement to CSS variables to tilt the entire 3D universe
+        document.addEventListener('mousemove', (e) => {
+            // Calculate percentage across the screen (-0.5 to 0.5)
+            const x = (e.clientX / window.innerWidth) - 0.5;
+            // Use clientY to ensure scrolling doesn't break the math
+            const y = (e.clientY / window.innerHeight) - 0.5;
+            
+            // Multiply by degrees for sensitivity
+            const rotateX = y * -50 + 'deg'; 
+            const rotateY = x * 50 + 'deg';
+
+            document.documentElement.style.setProperty('--mouse-x', rotateY);
+            document.documentElement.style.setProperty('--mouse-y', rotateX);
+        });
+
+        // --- 2. INTERSECTION OBSERVER FOR SCROLL ANIMATIONS ---
+        // This is a massive senior flex: native JS to reveal cards as you scroll down
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1 // Trigger when 10% of the card is visible
+        };
+
+        const cardObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Add the class that triggers the CSS opacity/transform transition
+                    entry.target.classList.add('reveal');
+                    // Stop observing once revealed for performance
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Target all bento cards
+        document.querySelectorAll('.card').forEach(card => {
+            cardObserver.observe(card);
+        });
+
+        // --- 3. SCROLL SPY FOR SIDEBAR NAVIGATION ---
+        // Automatically highlights the correct sidebar link based on scroll position
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                // If we scroll past 1/3 of the section, count it as active
+                if (scrollY >= (sectionTop - sectionHeight / 3)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

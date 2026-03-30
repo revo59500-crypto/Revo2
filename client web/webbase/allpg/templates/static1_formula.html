@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE | The Formula</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --acid-lemon: #ccff00;
+            --hot-magenta: #ff007a;
+            --cyber-blue: #00f0ff;
+            --void-black: #050505;
+        }
+
+        body {
+            margin: 0; padding: 0; background-color: var(--void-black);
+            font-family: 'Space Grotesk', sans-serif; color: white;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Nav */
+        nav { padding: 40px 5%; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Syncopate'; font-size: 1.5rem; color: var(--acid-lemon); text-decoration: none; }
+        .back-btn { color: white; text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; border-bottom: 1px solid var(--cyber-blue); padding-bottom: 5px; }
+
+        /* Content */
+        .container { padding: 50px 10%; max-width: 1200px; margin: 0 auto; }
+        h1 { font-family: 'Syncopate'; font-size: clamp(3rem, 8vw, 6rem); color: transparent; -webkit-text-stroke: 1px white; margin-bottom: 50px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        
+        .card {
+            background: rgba(10,10,10,0.8); border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px; backdrop-filter: blur(10px); transition: 0.4s;
+            position: relative; overflow: hidden;
+        }
+        
+        .card::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 3px;
+            background: var(--cyber-blue); transition: 0.5s;
+        }
+        
+        .card:hover::before { left: 0; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0, 240, 255, 0.1); border-color: rgba(0, 240, 255, 0.3); }
+
+        .card h2 { color: var(--cyber-blue); font-family: 'Syncopate'; font-size: 1.2rem; margin-bottom: 20px; }
+        .card p { line-height: 1.8; color: rgba(255,255,255,0.7); }
+
+        @media (max-width: 768px) { .container { padding: 50px 5%; } }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html" class="logo">PULSE.</a>
+<a href="{% url 'services-static' %}" class="back-btn">← Back to Core</a>
+    </nav>
+
+    <div class="container">
+        <h1>THE<br>FORMULA</h1>
+        <div class="grid">
+            <div class="card">
+                <h2>01. CRYO-EXTRACTED</h2>
+                <p>We eliminated heat pasteurization. By using sub-zero extraction, we preserve the organic bonds in our natural botanicals, ensuring a sharper, cleaner flavor profile that hits the palate with maximum intensity.</p>
+            </div>
+            <div class="card" style="border-top-color: var(--hot-magenta);">
+                <h2 style="color: var(--hot-magenta);">02. NEURO-SYNC</h2>
+                <p>Sugar crashes are obsolete. Pulse is engineered with a proprietary blend of B-Vitamins, L-Theanine, and natural green tea caffeine to provide a sustained, jitter-free focus loop lasting up to 6 hours.</p>
+            </div>
+            <div class="card" style="border-top-color: var(--acid-lemon);">
+                <h2 style="color: var(--acid-lemon);">03. ZERO SYNTHETICS</h2>
+                <p>No aspartame. No red dye 40. We use monk fruit extract and naturally derived colorants from spirulina and dragonfruit. It looks radioactive, but it's 100% earth-grown.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE | Pure Energy</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --acid-lemon: #ccff00;
+            --hot-magenta: #ff007a;
+            --cyber-blue: #00f0ff;
+            --void-black: #050505;
+            --glass: rgba(5, 5, 5, 0.85);
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: var(--void-black);
+            font-family: 'Space Grotesk', sans-serif;
+            color: white;
+            overflow: hidden;
+            touch-action: none; /* Prevents pull-to-refresh on mobile */
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes breatheGlow {
+            0% { text-shadow: 0 0 10px rgba(204, 255, 0, 0.1); }
+            50% { text-shadow: 0 0 40px rgba(204, 255, 0, 0.3); }
+            100% { text-shadow: 0 0 10px rgba(204, 255, 0, 0.1); }
+        }
+
+        /* 3D Canvas Layer */
+        #webgl-container {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 1;
+        }
+
+        /* UI Layer */
+        .ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 40px 5%;
+            box-sizing: border-box;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            pointer-events: auto;
+            animation: fadeDown 1s ease-out forwards;
+        }
+
+        .logo { 
+            font-family: 'Syncopate'; font-size: 2rem; 
+            color: var(--acid-lemon); letter-spacing: 2px;
+        }
+
+        .nav-links { display: flex; gap: 40px; }
+        .nav-links a { 
+            color: white; text-decoration: none; 
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+            transition: 0.3s; position: relative;
+        }
+        .nav-links a::after {
+            content: ''; position: absolute; width: 0; height: 1px;
+            bottom: -5px; left: 0; background-color: var(--hot-magenta);
+            transition: 0.3s;
+        }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a:hover { color: var(--hot-magenta); }
+
+        /* Massive Hero Text */
+        .hero-title {
+            text-align: center;
+            font-family: 'Syncopate';
+            font-size: clamp(4rem, 18vw, 15rem);
+            line-height: 0.8;
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(255,255,255,0.05);
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; z-index: 5;
+            pointer-events: none;
+            animation: breatheGlow 4s infinite ease-in-out;
+        }
+
+        /* Bottom Controls */
+        .controls {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            pointer-events: auto;
+            animation: fadeUp 1s ease-out forwards;
+        }
+
+        .instruction {
+            font-size: 0.8rem; letter-spacing: 3px; color: rgba(255,255,255,0.5);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .instruction span {
+            width: 30px; height: 1px; background: rgba(255,255,255,0.5); display: inline-block;
+        }
+
+        .btn-specs {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--acid-lemon); color: var(--acid-lemon);
+            padding: 15px 35px; font-family: 'Space Grotesk'; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-specs:hover {
+            background: var(--acid-lemon); color: var(--void-black);
+            transform: translateY(-5px); box-shadow: 0 10px 20px rgba(204, 255, 0, 0.2);
+        }
+
+        /* --- THE BRAND DATABANK (OVERLAY) --- */
+        #specs-overlay {
+            position: fixed; top: 0; right: -100%; 
+            width: 500px; max-width: 100vw; height: 100vh;
+            background: var(--glass); backdrop-filter: blur(25px);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            z-index: 100; padding: 80px 40px; overflow-y: auto; pointer-events: auto;
+            transition: right 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            box-sizing: border-box;
+        }
+
+        #specs-overlay.active { right: 0; box-shadow: -20px 0 50px rgba(0,0,0,0.5); }
+
+        .close-btn {
+            background: none; border: none; color: white; font-size: 2.5rem;
+            cursor: pointer; position: absolute; top: 20px; right: 30px; transition: 0.3s;
+        }
+        .close-btn:hover { color: var(--hot-magenta); transform: rotate(90deg); }
+
+        .section-tag {
+            color: var(--cyber-blue); font-size: 0.8rem; letter-spacing: 3px;
+            text-transform: uppercase; margin-bottom: 5px; display: block;
+        }
+
+        .specs-content h2 {
+            font-family: 'Syncopate'; color: var(--acid-lemon); font-size: 1.8rem;
+            margin-bottom: 30px; line-height: 1.2;
+        }
+
+        .spec-item {
+            margin-bottom: 35px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 25px;
+            transition: 0.3s;
+        }
+        .spec-item:hover { border-bottom-color: var(--hot-magenta); padding-left: 10px; }
+
+        .spec-item h3 {
+            font-size: 1.1rem; color: white; text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 10px;
+        }
+
+        .spec-item p {
+            font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.6);
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .nav-links { display: none; } /* Hide heavy nav on small phones */
+            .controls { flex-direction: column; align-items: center; gap: 30px; }
+            .hero-title { -webkit-text-stroke: 1px rgba(255,255,255,0.1); }
+            #specs-overlay { width: 100vw; padding: 60px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="webgl-container"></div>
+
+    <h1 class="hero-title">PULSE</h1>
+
+    <div class="ui-layer">
+        <nav>
+            <div class="logo">PULSE.</div>
+            <div class="nav-links">
+                <a href="{% url 'services-static1-formula' %}">The Formula</a>
+                <a href="{% url 'services-static2-story' %}">Our Story</a>
+<a href="{% url 'services-static3-contact' %}">Contact us</a>
+
+            </div>
+        </nav>
+
+        <div class="controls">
+            <div class="instruction">
+                <span></span> SWIPE TO INTERACT <span></span>
+            </div>
+            <button class="btn-specs" onclick="toggleSpecs()">Access Data</button>
+        </div>
+    </div>
+
+    <div id="specs-overlay">
+        <button class="close-btn" onclick="toggleSpecs()">&times;</button>
+        <div class="specs-content">
+            
+            <span class="section-tag">Origin Story</span>
+            <h2>Forged in the Cold.</h2>
+            <div class="spec-item">
+                <h3>The Pulse Mission</h3>
+                <p>Founded in 2026, Pulse was created to bridge the gap between pure hydration and high-voltage energy. We stripped away the syrups, removed the artificial dyes, and created a beverage that powers the digital generation.</p>
+            </div>
+            <div class="spec-item">
+                <h3>Cryo-Extraction Tech</h3>
+                <p>Instead of boiling our ingredients, we use sub-zero cryo-extraction. This preserves the natural botanicals, giving our drink a crisp, electric snap that traditional sodas lose during pasteurization.</p>
+            </div>
+
+            <br><br>
+
+            <span class="section-tag">Web Architecture</span>
+            <h2 style="color: var(--hot-magenta);">Static Power.</h2>
+            <div class="spec-item">
+                <h3 style="color: var(--acid-lemon);">01. Zero Latency Delivery</h3>
+                <p>This experience is delivered via a static file system. With no database to query, the site loads instantly worldwide, allowing complex 3D WebGL assets to run smoothly on any device.</p>
+            </div>
+            <div class="spec-item">
+                <h3 style="color: var(--acid-lemon);">02. Impenetrable Security</h3>
+                <p>Because there is no active server-side code or SQL database, static architectures eliminate 99% of traditional web vulnerabilities. Pure visuals, zero risk.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle the hidden drawer
+        function toggleSpecs() {
+            document.getElementById('specs-overlay').classList.toggle('active');
+        }
+
+        // Three.js Setup
+        let scene, camera, renderer, can;
+        let isDragging = false;
+        let previousPosition = { x: 0, y: 0 };
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize for mobile
+            document.getElementById('webgl-container').appendChild(renderer.domElement);
+
+            // Sleek Aluminum Can
+            const geometry = new THREE.CylinderGeometry(1.2, 1.2, 4, 64);
+            const material = new THREE.MeshPhysicalMaterial({ 
+                color: 0x0a0a0a, // Obsidian Black
+                metalness: 0.95, 
+                roughness: 0.15,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.1
+            });
+            can = new THREE.Mesh(geometry, material);
+            scene.add(can);
+
+            // Studio Lighting Setup
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            mainLight.position.set(5, 10, 7);
+            scene.add(mainLight);
+
+            const pinkLight = new THREE.PointLight(0xff007a, 8, 50);
+            pinkLight.position.set(6, -2, 5);
+            scene.add(pinkLight);
+
+            const cyanLight = new THREE.PointLight(0x00f0ff, 8, 50);
+            cyanLight.position.set(-6, 5, 5);
+            scene.add(cyanLight);
+
+            camera.position.z = 12;
+
+            // --- UNIVERSAL DRAG LOGIC (Mouse + Touch) ---
+            const startDrag = (e) => {
+                isDragging = true;
+                previousPosition = { 
+                    x: e.touches ? e.touches[0].clientX : e.clientX, 
+                    y: e.touches ? e.touches[0].clientY : e.clientY 
+                };
+            };
+
+            const endDrag = () => isDragging = false;
+
+            const moveDrag = (e) => {
+                if (!isDragging) return;
+                const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                const deltaMove = {
+                    x: currentX - previousPosition.x,
+                    y: currentY - previousPosition.y
+                };
+                
+                can.rotation.y += deltaMove.x * 0.01;
+                can.rotation.x += deltaMove.y * 0.01;
+                
+                previousPosition = { x: currentX, y: currentY };
+            };
+
+            // Mouse Events
+            document.addEventListener('mousedown', startDrag);
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('mousemove', moveDrag);
+
+            // Touch Events (Mobile Support)
+            document.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+            document.addEventListener('touchmove', moveDrag, { passive: false });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            // Gentle auto-rotation and floating effect
+            if (!isDragging) {
+                can.rotation.y += 0.003;
+                can.position.y = Math.sin(Date.now() * 0.001) * 0.3; 
+            }
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        init();
+        animate();
+    </script>
+</body>
+</html>

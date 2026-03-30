@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE | Secure Channel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --acid-lemon: #ccff00;
+            --hot-magenta: #ff007a;
+            --cyber-blue: #00f0ff;
+            --void-black: #050505;
+            --glass: rgba(10, 10, 10, 0.6);
+        }
+
+        body {
+            margin: 0; padding: 0; 
+            background-color: var(--void-black);
+            font-family: 'Space Grotesk', sans-serif; 
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            /* Subtle radar-like background */
+            background-image: radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.1) 0%, transparent 50%);
+        }
+
+        /* Nav */
+        nav { 
+            padding: 40px 5%; display: flex; justify-content: space-between; align-items: center; 
+            position: relative; z-index: 100;
+        }
+        .logo { font-family: 'Syncopate'; font-size: 1.5rem; color: var(--acid-lemon); text-decoration: none; letter-spacing: 2px; }
+        .back-btn { color: white; text-decoration: none; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; transition: color 0.3s;}
+        .back-btn:hover { color: var(--hot-magenta); }
+
+        /* Main Container */
+        .contact-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 5%;
+            z-index: 10;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            padding: 60px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        /* Left Side: Info */
+        .info-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .info-panel h1 {
+            font-family: 'Syncopate';
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 20px;
+            line-height: 1.1;
+            color: white;
+        }
+
+        .highlight { color: var(--cyber-blue); }
+
+        .info-block { margin-top: 40px; }
+        .info-block h3 {
+            font-size: 0.8rem;
+            color: var(--hot-magenta);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        .info-block p {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+            margin: 0 0 5px 0;
+            letter-spacing: 1px;
+        }
+
+        /* Right Side: Form */
+        .form-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 0;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            resize: none;
+        }
+
+        /* Glowing Focus Effects */
+        input:focus, textarea:focus {
+            border-bottom-color: var(--acid-lemon);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+        }
+
+        /* The Animated Line underneath inputs */
+        .input-line {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 2px;
+            background: var(--acid-lemon);
+            transition: 0.4s ease;
+        }
+
+        input:focus ~ .input-line, 
+        textarea:focus ~ .input-line {
+            width: 100%;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            margin-top: 20px;
+            background: transparent;
+            border: 1px solid var(--cyber-blue);
+            color: var(--cyber-blue);
+            padding: 18px 40px;
+            font-family: 'Space Grotesk';
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            align-self: flex-start;
+        }
+
+        .btn-submit:hover {
+            background: var(--cyber-blue);
+            color: var(--void-black);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                padding: 40px 20px;
+                gap: 40px;
+            }
+            .info-panel h1 { font-size: 2.5rem; }
+            .btn-submit { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="{% url 'services-static' %}" class="logo">PULSE.</a>
+        <a href="{% url 'services-static' %}" class="back-btn">TERMINATE CONNECTION</a>
+    </nav>
+
+    <div class="contact-wrapper">
+        <div class="contact-grid">
+            
+            <div class="info-panel">
+                <h1>INITIATE <br><span class="highlight">CONTACT.</span></h1>
+                <p style="color: rgba(255,255,255,0.6); line-height: 1.6; max-width: 400px;">
+                    Whether you're looking to stock Pulse in your venue, or you just want to talk tech, open a channel below. Our grid monitors are standing by.
+                </p>
+
+                <div class="info-block">
+                    <h3>Global HQ Coordinates</h3>
+                    <p>Sector 07, Innovation Dist.</p>
+                    <p>Neo-Metropolis, Earth</p>
+                </div>
+
+                <div class="info-block">
+                    <h3>Direct Comms</h3>
+                    <p>signal@drinkpulse.com</p>
+                </div>
+            </div>
+
+            <form class="form-panel" onsubmit="event.preventDefault(); alert('Transmission Sent. We will contact you shortly.');">
+                
+                <div class="input-group">
+                    <input type="text" required placeholder="CALLSIGN (YOUR NAME)">
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="input-group">
+                    <input type="email" required placeholder="SECURE COMM-LINK (EMAIL)">
+                    <div class="input-line"></div>
+                </div>
+
+                <div class="input-group">
+                    <textarea rows="5" required placeholder="YOUR TRANSMISSION (MESSAGE)"></textarea>
+                    <div class="input-line"></div>
+                </div>
+
+                <button type="submit" class="btn-submit">TRANSMIT DATA</button>
+
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

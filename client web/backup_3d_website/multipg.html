@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Enterprise Pitch Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- Elite Color Palette & Variables --- */
+        :root {
+            --bg-base: #030014;
+            --surface-glass: rgba(255, 255, 255, 0.03);
+            --surface-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #FFFFFF;
+            --text-secondary: #8b949e;
+            
+            /* Vibrant Neon Accents */
+            --neon-blue: #00f0ff;
+            --neon-purple: #b026ff;
+            --neon-pink: #ff0055;
+            
+            --gradient-text: linear-gradient(to right, var(--neon-blue), var(--neon-purple));
+            --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+            
+            --sidebar-width: 300px;
+            --radius-xl: 32px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- Animated Aurora Background --- */
+        .bg-orbs {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            background: #030014;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.5;
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 600px; height: 600px; background: var(--neon-purple); top: -10%; left: -10%; }
+        .orb-2 { width: 500px; height: 500px; background: var(--neon-blue); bottom: -20%; right: -10%; animation-delay: -5s; }
+        .orb-3 { width: 400px; height: 400px; background: var(--neon-pink); top: 40%; left: 40%; animation-delay: -10s; opacity: 0.3;}
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(100px, 50px) scale(1.2); }
+        }
+
+        /* --- Floating Glass Sidebar --- */
+        .sidebar-wrapper {
+            width: var(--sidebar-width);
+            padding: 2rem;
+            z-index: 50;
+        }
+
+        .sidebar {
+            background: var(--surface-glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-xl);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 2.5rem 1.5rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 3rem;
+            line-height: 1;
+        }
+
+        .logo span {
+            background: var(--gradient-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-list { list-style: none; overflow-y: auto; flex-grow: 1; }
+        .nav-list::-webkit-scrollbar { display: none; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 14px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--gradient-text); opacity: 0; transition: opacity 0.4s ease; z-index: -1;
+        }
+
+        .nav-link:hover { color: #fff; transform: translateX(8px); }
+        
+        .nav-link.active {
+            color: #fff; font-weight: 700;
+            box-shadow: 0 10px 25px -5px rgba(176, 38, 255, 0.3);
+        }
+        .nav-link.active::before { opacity: 0.15; }
+
+        /* --- Main Content & Layout --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem 4rem 2rem 1rem;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .main-content::-webkit-scrollbar { display: none; }
+
+        .page-section {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-bottom: 8rem;
+        }
+
+        .page-section.active { display: block; }
+
+        /* --- Typography --- */
+        .tagline {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--neon-blue);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 5.5rem;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 2rem;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { font-size: 2.5rem; font-weight: 700; margin: 4rem 0 2rem; }
+        
+        p.lead {
+            font-size: 1.5rem;
+            color: #c9d1d9;
+            max-width: 800px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        p { font-size: 1.15rem; color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.5rem; max-width: 800px; }
+
+        /* --- Asymmetrical Bento Grid --- */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        /* Specific card spans to show complex layout logic */
+        .span-2 { grid-column: span 2; }
+        .span-3 { grid-column: span 3; }
+        .row-span-2 { grid-row: span 2; }
+
+        .card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--surface-border);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 40px rgba(176, 38, 255, 0.1);
+        }
+
+        .card h3 { font-size: 1.8rem; margin-bottom: 1rem; font-weight: 700; }
+        .card .stat { font-size: 4rem; font-weight: 900; background: var(--gradient-text); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; line-height: 1;}
+
+        /* --- Complex Animations --- */
+        .anim-element { opacity: 0; transform: translateY(40px) scale(0.95); }
+        
+        .page-section.active .anim-element {
+            animation: popIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 1200px) { .bento-grid { grid-template-columns: repeat(2, 1fr); } .span-3 { grid-column: span 2; } h1 { font-size: 4rem; } }
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow-y: auto; }
+            .bg-orbs { position: fixed; }
+            .sidebar-wrapper { width: 100%; padding: 1rem; position: sticky; top: 0; z-index: 100; }
+            .sidebar { padding: 1.5rem; flex-direction: row; align-items: center; justify-content: space-between; border-radius: 16px; }
+            .logo { margin: 0; font-size: 1.8rem; }
+            .nav-list { display: flex; overflow-x: auto; margin-left: 1rem; gap: 0.5rem; }
+            .nav-link { padding: 0.5rem 1rem; white-space: nowrap; font-size: 1rem; }
+            .main-content { padding: 1rem; }
+            .bento-grid { grid-template-columns: 1fr; }
+            .span-2, .span-3, .row-span-2 { grid-column: span 1; grid-row: span 1; }
+            h1 { font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <div class="sidebar-wrapper">
+        <aside class="sidebar">
+            <div class="logo">AURA<span>Q</span></div>
+            <ul class="nav-list">
+                <li><a class="nav-link active" data-target="home">01. Overview</a></li>
+                <li><a class="nav-link" data-target="about">02. Intelligence</a></li>
+                <li><a class="nav-link" data-target="services">03. Capabilities</a></li>
+                <li><a class="nav-link" data-target="solutions">04. Ecosystems</a></li>
+                <li><a class="nav-link" data-target="portfolio">05. Deployment</a></li>
+                <li><a class="nav-link" data-target="metrics">06. Telemetry</a></li>
+                <li><a class="nav-link" data-target="team">07. Core Team</a></li>
+                <li><a class="nav-link" data-target="blog">08. Neural Net</a></li>
+                <li><a class="nav-link" data-target="contact">09. Initialization</a></li>
+            </ul>
+        </aside>
+    </div>
+
+    <main class="main-content">
+        
+        <section id="home" class="page-section active">
+            <div class="tagline anim-element delay-1">System Architecture v3.0</div>
+            <h1 class="anim-element delay-2">Engineering the<br>Impossible.</h1>
+            <p class="lead anim-element delay-3">We architect high-velocity, scalable digital ecosystems for enterprises that refuse to compromise. This is what the future of web rendering looks like.</p>
+            
+            <div class="bento-grid">
+                <div class="card span-2 anim-element delay-4">
+                    <div class="stat">$2.4B</div>
+                    <h3>Revenue Processed Securely</h3>
+                    <p>Our monolithic teardowns and microservice implementations currently handle billions in secure transactions across 40 global regions with zero latency spikes.</p>
+                </div>
+                <div class="card anim-element delay-4">
+                    <div class="stat">99.9%</div>
+                    <h3>Uptime Guarantee</h3>
+                    <p>Redundant serverless architecture.</p>
+                </div>
+                <div class="card span-3 anim-element delay-4">
+                    <h3>Beyond Standard Rendering</h3>
+                    <p>Notice the fluidity of this prototype? By utilizing virtual DOM manipulations, asynchronous data fetching, and hardware-accelerated CSS keyframes, we ensure that your users experience applications that feel native, responsive, and alive.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="page-section">
+            <div class="tagline anim-element delay-1">Entity Origin</div>
+            <h1 class="anim-element delay-2">Born from data.<br>Built for scale.</h1>
+            <p class="lead anim-element delay-3">AuraQ was founded by ex-engineers from DeepMind and Stripe. We don't just build websites; we engineer data pipelines and consumer experiences.</p>
+            
+            <div class="bento-grid">
+                <div class="card row-span-2 anim-element delay-4" style="background: rgba(176, 38, 255, 0.1); border-color: var(--neon-purple);">
+                    <h3 style="color: var(--neon-purple);">Our Prime Directive</h3>
+                    <p style="color: #fff;">To eliminate technical debt. Most enterprise architectures are tangled webs of legacy code. We systematically dismantle inefficiencies and replace them with modular, highly cohesive logic structures that are infinitely scalable.</p>
+                    <br><br>
+                    <p style="color: #fff;"><strong>Security Protocols:</strong> Military-grade AES-256 encryption at rest and in transit.</p>
+                </div>
+                <div class="card anim-element delay-4">
+                    <h3>2015</h3>
+                    <p>AuraQ Initialized in San Francisco.</p>
+                </div>
+                <div class="card anim-element delay-4">
+                    <h3>450+</h3>
+                    <p>Global engineering nodes deployed.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="services" class="page-section">
+            <div class="tagline anim-element delay-1">Execution Matrix</div>
+            <h1 class="anim-element delay-2">Full-Spectrum<br>Engineering.</h1>
+            <p class="lead anim-element delay-3">We are a specialized strike team for your toughest technical bottlenecks. From predictive AI models to hyper-fast frontends.</p>
+            
+            <div class="bento-grid">
+                <div class="card anim-element delay-4">
+                    <h3>Cloud Native Computing</h3>
+                    <p>AWS, GCP, and Azure migrations utilizing Docker containers and Kubernetes orchestration for auto-scaling deployments.</p>
+                </div>
+                <div class="card anim-element delay-4">
+                    <h3>Web3 & Blockchain</h3>
+                    <p>Smart contract development, decentralized identity verification, and high-throughput ledger systems.</p>
+                </div>
+                <div class="card anim-element delay-4">
+                    <h3>Generative AI Integration</h3>
+                    <p>Custom LLM training and RAG (Retrieval-Augmented Generation) pipelines for internal enterprise knowledge bases.</p>
+                </div>
+                <div class="card span-3 anim-element delay-4" style="background: url('data:image/svg+xml;utf8,<svg width=\"100\" height=\"100\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"5\" cy=\"5\" r=\"2\" fill=\"%23ffffff\" opacity=\"0.1\"/></svg>');">
+                    <h3>Immersive UI/UX</h3>
+                    <p>Design systems that dictate visual hierarchy, motion guidelines, and accessibility standards (WCAG 2.2 AAA), ensuring your application is gorgeous and usable by everyone on earth.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="solutions" class="page-section">
+            <div class="tagline anim-element delay-1">Industry Verticals</div>
+            <h1 class="anim-element delay-2">Tailored algorithms.</h1>
+            <p class="lead anim-element delay-3">Off-the-shelf software breaks under enterprise pressure. We build bespoke ecosystems tailored to your specific market physics.</p>
+            <div class="bento-grid">
+                <div class="card span-2 anim-element delay-4">
+                    <h3>High-Frequency Finance</h3>
+                    <p>Sub-millisecond trading dashboards and automated risk-assessment pipelines. We build systems where a microsecond delay is unacceptable.</p>
+                </div>
+                <div class="card anim-element delay-4">
+                    <h3>Global Logistics</h3>
+                    <p>Real-time fleet tracking via WebSocket connections and predictive supply chain AI.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="page-section">
+            <div class="tagline anim-element delay-1">Live Environments</div>
+            <h1 class="anim-element delay-2">Proven in production.</h1>
+            <div class="bento-grid">
+                <div class="card span-3 anim-element delay-3" style="border-left: 4px solid var(--neon-blue);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3>Project: OMNI-RETAIL</h3>
+                        <span style="color: var(--neon-blue); font-weight: bold;">[ CLASSIFIED / CLEARED ]</span>
+                    </div>
+                    <p><strong>Challenge:</strong> A global fashion retailer's monolith architecture crashed during Black Friday, losing an estimated $12M an hour.</p>
+                    <p><strong>Solution:</strong> Transitioned them to a Headless Commerce architecture (Next.js frontend, Shopify Plus backend) in 4 months.</p>
+                    <p><strong>Result:</strong> 0 downtime the following year. 300% faster page loads. 14% increase in conversion rate.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="metrics" class="page-section">
+            <div class="tagline anim-element delay-1">Data Driven</div>
+            <h1 class="anim-element delay-2">We let the math<br>do the talking.</h1>
+            <div class="bento-grid">
+                <div class="card anim-element delay-3">
+                    <div class="stat">+400%</div>
+                    <h3>User Retention</h3>
+                    <p>Achieved for MediCore Health app post UX redesign.</p>
+                </div>
+                <div class="card anim-element delay-3">
+                    <div class="stat">-85%</div>
+                    <h3>Server Costs</h3>
+                    <p>Optimized via AWS Lambda serverless functions.</p>
+                </div>
+                <div class="card anim-element delay-3">
+                    <div class="stat">1.2s</div>
+                    <h3>Time to Interactive</h3>
+                    <p>Average global load time across our enterprise platforms.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="team" class="page-section">
+            <div class="tagline anim-element delay-1">Human Capital</div>
+            <h1 class="anim-element delay-2">Elite operators.</h1>
+            <div class="bento-grid">
+                <div class="card anim-element delay-3">
+                    <h3 style="color: var(--neon-pink);">Dr. E. Vance</h3>
+                    <p>Chief AI Architect. Ph.D. in Machine Learning from MIT. Lead developer on proprietary predictive algorithms.</p>
+                </div>
+                <div class="card anim-element delay-3">
+                    <h3 style="color: var(--neon-blue);">K. Reynolds</h3>
+                    <p>VP of Engineering. 12 years scaling systems at FAANG companies. Master of distributed systems.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="blog" class="page-section">
+            <div class="tagline anim-element delay-1">Knowledge Base</div>
+            <h1 class="anim-element delay-2">Signal over noise.</h1>
+            <div class="bento-grid">
+                <div class="card span-2 anim-element delay-3">
+                    <h3>The End of the REST API?</h3>
+                    <p>Why GraphQL and tRPC are becoming the mandatory standards for data-heavy enterprise applications looking to minimize payload sizes.</p>
+                </div>
+                <div class="card anim-element delay-3">
+                    <h3>Quantum Encryption</h3>
+                    <p>Preparing your databases for the next generation of cryptographic threats.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="page-section">
+            <div class="tagline anim-element delay-1">Commence Operations</div>
+            <h1 class="anim-element delay-2">Initialize project.</h1>
+            <p class="lead anim-element delay-3">Partnering with AuraQ means a commitment to absolute digital superiority. Secure your bandwidth for Q3.</p>
+            
+            <div class="card span-2 anim-element delay-4" style="max-width: 700px; margin-top: 2rem; border: 1px solid var(--neon-purple);">
+                <form onsubmit="event.preventDefault(); alert('Handshake protocol initiated. We will contact you shortly.');">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <input type="text" placeholder="Executive Name" style="width: 100%; padding: 1.2rem; background: rgba(0,0,0,0.5); border: 1px solid var(--surface-border); border-radius: 12px; color: white; font-size: 1rem; outline: none;" required>
+                        <input type="email" placeholder="Enterprise Email" style="width: 100%; padding: 1.2rem; background: rgba(0,0,0,0.5); border: 1px solid var(--surface-border); border-radius: 12px; color: white; font-size: 1rem; outline: none;" required>
+                    </div>
+                    <textarea placeholder="Project Parameters & Scope" rows="4" style="width: 100%; padding: 1.2rem; background: rgba(0,0,0,0.5); border: 1px solid var(--surface-border); border-radius: 12px; color: white; font-size: 1rem; outline: none; margin-bottom: 1.5rem;" required></textarea>
+                    <button type="submit" style="background: var(--gradient-text); color: white; border: none; padding: 1.2rem 3rem; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; width: 100%; transition: transform 0.2s;">ENGAGE SYSTEM</button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.page-section');
+            const mainContent = document.querySelector('.main-content');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Update Active State
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    const targetId = link.getAttribute('data-target');
+                    
+                    // Transition Logic
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        // Force DOM reflow to restart heavy keyframe animations
+                        const animatedElements = section.querySelectorAll('.anim-element');
+                        animatedElements.forEach(el => {
+                            el.style.animation = 'none';
+                            el.offsetHeight; /* trigger reflow */
+                            el.style.animation = null; 
+                        });
+                    });
+                    
+                    // Show new section
+                    document.getElementById(targetId).classList.add('active');
+                    
+                    // Smooth scroll to top of content area
+                    mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

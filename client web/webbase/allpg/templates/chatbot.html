@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+{% block title %}AI & Chatbots - REVO{% endblock title %}
+
+{% block body %}
+<style>
+    /* --- REVO AI THEME VARIABLES --- */
+    :root {
+        --revo-ai-primary: #00f2fe;
+        --revo-ai-secondary: #4facfe;
+        --revo-ai-accent: #00ffcc; /* Matrix/Cyber green for AI */
+        --revo-bg-dark: #050508;
+        --glass-bg: rgba(10, 10, 15, 0.65);
+        --glass-border: rgba(0, 255, 204, 0.15);
+    }
+
+    /* --- CANVAS BACKGROUND --- */
+    #neural-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        pointer-events: none;
+        background-color: var(--revo-bg-dark);
+    }
+
+    /* --- LAYOUT & TYPOGRAPHY --- */
+    .ai-viewport {
+        position: relative;
+        z-index: 1;
+        padding: 8rem 0 4rem 0;
+        min-height: 100vh;
+        color: #ffffff;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        overflow-x: hidden;
+    }
+
+    .text-ai-gradient {
+        background: linear-gradient(135deg, #ffffff 0%, var(--revo-ai-primary) 50%, var(--revo-ai-accent) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-shadow: 0 0 40px rgba(0, 255, 204, 0.3);
+    }
+
+    .text-ai-accent { color: var(--revo-ai-accent); }
+
+    /* --- HERO SECTION --- */
+    .hero-section {
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto 6rem auto;
+        padding: 0 1.5rem;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        background: rgba(0, 255, 204, 0.05);
+        border: 1px solid rgba(0, 255, 204, 0.3);
+        border-radius: 50px;
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 2rem;
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.1);
+        animation: pulseGlow 3s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+        0% { box-shadow: 0 0 10px rgba(0, 255, 204, 0.1); border-color: rgba(0, 255, 204, 0.2); }
+        100% { box-shadow: 0 0 30px rgba(0, 255, 204, 0.4); border-color: rgba(0, 255, 204, 0.6); }
+    }
+
+    /* --- GLASSMORPHISM CARDS --- */
+    .ai-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    .ai-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+        border-top: 1px solid rgba(0, 255, 204, 0.4);
+        border-radius: 20px;
+        padding: 3rem 2rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ai-card:hover {
+        transform: translateY(-10px);
+        border-color: rgba(0, 255, 204, 0.6);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 255, 204, 0.1);
+    }
+
+    .ai-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 50%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+        transform: skewX(-20deg);
+        transition: 0.7s;
+    }
+
+    .ai-card:hover::before {
+        left: 150%;
+    }
+
+    .ai-icon-wrapper {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        background: rgba(0, 255, 204, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: var(--revo-ai-accent);
+        margin-bottom: 2rem;
+        border: 1px solid rgba(0, 255, 204, 0.2);
+    }
+
+    /* --- ANIMATION CLASSES (Triggered via JS) --- */
+    .reveal {
+        opacity: 0;
+        transform: translateY(50px);
+        transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+    }
+    .reveal.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+
+    /* --- RESPONSIVE ADJUSTMENTS --- */
+    @media (max-width: 768px) {
+        .ai-viewport { padding-top: 6rem; }
+        .hero-section h1 { font-size: 2.5rem !important; }
+        .ai-card { padding: 2rem 1.5rem; }
+    }
+</style>
+
+<canvas id="neural-canvas"></canvas>
+
+<div class="ai-viewport">
+    
+    <div class="hero-section reveal active">
+        <div class="status-badge">
+            <i class="fas fa-circle text-ai-accent me-2" style="font-size: 0.6rem; vertical-align: middle;"></i> 
+            Systems Online
+        </div>
+        <h1 class="display-2 text-ai-gradient mb-4">Sentient Architecture</h1>
+        <p class="lead text-light opacity-75 mx-auto" style="max-width: 650px; line-height: 1.8;">
+            Deploy self-learning algorithms, conversational interfaces, and autonomous support agents. We build AI that doesn't just respond—it anticipates.
+        </p>
+    </div>
+
+    <div class="ai-grid mb-5 pb-5">
+        
+        <div class="ai-card reveal delay-1">
+            <div class="ai-icon-wrapper">
+                <i class="fas fa-brain"></i>
+            </div>
+            <h3 class="fw-bold mb-3">LLM Integration</h3>
+            <p class="text-light opacity-75 mb-4">
+                We integrate state-of-the-art Large Language Models directly into your ecosystem. Move beyond scripted bots to dynamic, context-aware digital assistants capable of complex reasoning.
+            </p>
+        </div>
+
+        <div class="ai-card reveal delay-2">
+            <div class="ai-icon-wrapper">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h3 class="fw-bold mb-3">Conversational UI</h3>
+            <p class="text-light opacity-75 mb-4">
+                Fluid chat interfaces designed for human-like pacing. Featuring real-time typing indicators, markdown support, streaming responses, and seamless escalation to human agents when required.
+            </p>
+        </div>
+
+        <div class="ai-card reveal delay-3">
+            <div class="ai-icon-wrapper">
+                <i class="fas fa-database"></i>
+            </div>
+            <h3 class="fw-bold mb-3">Vector Data Retrieval</h3>
+            <p class="text-light opacity-75 mb-4">
+                We connect AI to your proprietary data using RAG (Retrieval-Augmented Generation). Your chatbot will instantly synthesize answers from your internal documents, wikis, and databases.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="container text-center reveal mt-5 pt-5 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
+        <h2 class="text-white mb-4">Initialize Your Matrix</h2>
+        <a href="{% url 'contact' %}" class="btn btn-lg font-monospace" style="background: var(--revo-ai-accent); color: #000; font-weight: bold; border-radius: 8px; padding: 1rem 2.5rem; transition: all 0.3s ease;">
+             DEPLOY_AGENT --> 
+        </a>
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        /* --- 1. SCROLL REVEAL ANIMATIONS (Intersection Observer) --- */
+        const reveals = document.querySelectorAll('.reveal');
+        
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Stop observing once revealed
+                }
+            });
+        }, revealOptions);
+
+        reveals.forEach(reveal => {
+            revealOnScroll.observe(reveal);
+        });
+
+        /* --- 2. NEURAL NETWORK CANVAS ENGINE (100% Bug-Free Vanilla JS) --- */
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let particles = [];
+        
+        // Configuration
+        const config = {
+            particleCount: window.innerWidth > 768 ? 100 : 50, // Fewer on mobile for performance
+            particleRadius: 1.5,
+            lineLength: 150,
+            particleSpeed: 0.5,
+            color: 'rgba(0, 255, 204, ', // Base color (Cyber Green)
+        };
+
+        let mouse = {
+            x: null,
+            y: null,
+            radius: 200 // Interaction radius
+        };
+
+        // Resize Canvas
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            initParticles(); // Reinitialize to prevent clustering on resize
+        });
+
+        // Track Mouse
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+        
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        // Particle Class
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * config.particleSpeed;
+                this.vy = (Math.random() - 0.5) * config.particleSpeed;
+            }
+
+            update() {
+                // Move particle
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges
+                if (this.x < 0 || this.x > width) this.vx = -this.vx;
+                if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+                // Mouse interactivity (slight repel effect)
+                if (mouse.x != null && mouse.y != null) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < mouse.radius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        
+                        this.x -= forceDirectionX * force * 2;
+                        this.y -= forceDirectionY * force * 2;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, config.particleRadius, 0, Math.PI * 2);
+                ctx.fillStyle = config.color + '0.8)';
+                ctx.fill();
+            }
+        }
+
+        // Initialize Array
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < config.particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        // Connect Particles with Lines
+        function connect() {
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let dx = particles[a].x - particles[b].x;
+                    let dy = particles[a].y - particles[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < config.lineLength) {
+                        // Opacity scales based on distance
+                        let opacity = 1 - (distance / config.lineLength);
+                        ctx.strokeStyle = config.color + opacity * 0.5 + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y);
+                        ctx.lineTo(particles[b].x, particles[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Animation Loop
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            connect();
+        }
+
+        // Boot up
+        resize();
+        initParticles();
+        animate();
+    });
+</script>
+{% endblock body %}

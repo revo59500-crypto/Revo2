@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Antigravity Portfolio | Deep Space Solutions{% endblock title %}
+
+{% block body %}
+<style>
+    /* --- Scoped Styles for the 3D Environment --- */
+    /* We avoid styling the <body> directly so we don't break your base.html */
+    
+    #space-portfolio-wrapper {
+        position: relative;
+        width: 100%;
+        /* If your base.html has a navbar, change 100vh to calc(100vh - 60px) */
+        height: 100vh; 
+        background-color: #020205;
+        overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* 3D Canvas Fixed in Background of the wrapper */
+    #webgl-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none; /* Let clicks pass through to UI */
+    }
+
+    /* Scrollable UI Layer */
+    #ui-scroll-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+    }
+
+    /* Custom Scrollbar for the UI layer */
+    #ui-scroll-layer::-webkit-scrollbar {
+        width: 8px;
+    }
+    #ui-scroll-layer::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.5);
+    }
+    #ui-scroll-layer::-webkit-scrollbar-thumb {
+        background: rgba(0, 242, 254, 0.5);
+        border-radius: 10px;
+    }
+
+    /* UI Content Containers */
+    .content-section {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 5rem 2rem;
+        position: relative;
+        color: #ffffff;
+    }
+
+    /* Advanced Glassmorphism */
+    .glass-panel {
+        background: rgba(15, 15, 25, 0.4);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-panel:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 40px 80px rgba(0, 242, 254, 0.2);
+        border-color: rgba(0, 242, 254, 0.3);
+    }
+
+    /* Typography */
+    .nebula-text {
+        background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    /* Responsive Grid for Services */
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .skill-badge {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 8px 20px;
+        border-radius: 50px;
+        margin: 5px;
+        display: inline-block;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        color: white;
+    }
+
+    .btn-stellar {
+        background: transparent;
+        color: #00f2fe;
+        border: 2px solid #00f2fe;
+        padding: 12px 35px;
+        border-radius: 50px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.4s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-stellar:hover {
+        background: #00f2fe;
+        color: #020205;
+        box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+    }
+</style>
+
+<div id="space-portfolio-wrapper">
+    <div id="webgl-container"></div>
+
+    <div id="ui-scroll-layer">
+        
+        <section class="content-section align-items-center text-center">
+            <div class="glass-panel" style="max-width: 800px;">
+                <h1 class="display-3 mb-4 nebula-text">Digital Universes, Engineered.</h1>
+                <p class="lead text-light opacity-75 mb-4">
+                    We transcend standard web design. From lightning-fast static pages to infinitely scalable multi-page architectures, we build digital assets that dominate your industry.
+                </p>
+                <a href="/services/" class="btn-stellar mt-3">Explore Our Services</a>
+            </div>
+        </section>
+
+        <section id="services" class="content-section">
+            <div class="container">
+                <h2 class="text-center display-5 mb-5 nebula-text">Architectures We Build</h2>
+                <div class="services-grid">
+                    
+                    <div class="glass-panel text-center">
+                        <i class="fas fa-rocket fa-3x mb-4 text-info"></i>
+                        <h4 class="mb-3">Single-Page Apps (SPA)</h4>
+                        <p class="text-light opacity-75">High-conversion, continuous-scroll experiences. Perfect for landing pages and focused campaigns.</p>
+                    </div>
+
+                    <div class="glass-panel text-center">
+                        <i class="fas fa-bolt fa-3x mb-4 text-info"></i>
+                        <h4 class="mb-3">Static Websites</h4>
+                        <p class="text-light opacity-75">Blazing fast, secure, and SEO-optimized. The gold standard for portfolios and local businesses.</p>
+                    </div>
+
+                    <div class="glass-panel text-center">
+                        <i class="fas fa-network-wired fa-3x mb-4 text-info"></i>
+                        <h4 class="mb-3">Multi-Page Ecosystems</h4>
+                        <p class="text-light opacity-75">Infinite scalability. Complex routing, massive content databases, and seamless navigation.</p>
+                    </div>
+
+                    <div class="glass-panel text-center">
+                        <i class="fas fa-vr-cardboard fa-3x mb-4 text-info"></i>
+                        <h4 class="mb-3">WebGL / 3D Experiences</h4>
+                        <p class="text-light opacity-75">Award-winning, interactive 3D environments that leave competitors in the dust.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section align-items-center">
+            <div class="glass-panel text-center" style="max-width: 900px; width: 100%;">
+                <h2 class="mb-4 nebula-text">Our Engineering Stack</h2>
+                <p class="mb-4 text-light opacity-75">Cutting-edge technology ensuring your platform is robust and future-proof.</p>
+                <div>
+                    <span class="skill-badge"><i class="fab fa-html5"></i> HTML5 </span>
+                    <span class="skill-badge"><i class="fab fa-Bootstrap"></i> Bootstrap</span>
+                    {% comment %} <span class="skill-badge"><i class="fab fa-react"></i> React.js</span> {% endcomment %}
+                    <span class="skill-badge"><i class="fab fa-python"></i> Python</span>
+                    <span class="skill-badge"><i class="fas fa-cube"></i> Django</span>
+                    <span class="skill-badge"><i class="fas fa-database"></i>Mongo DB (Coming soon)</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section align-items-center text-center pb-5">
+            <div class="glass-panel" style="max-width: 600px;">
+                <h2 class="mb-3 nebula-text">Ready to Launch?</h2>
+                <p class="lead text-light opacity-75 mb-4">Let's engineer a custom digital universe for your brand today.</p>
+                <a href="/contact/" class="btn-stellar">Initiate Contact</a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const container = document.getElementById('webgl-container');
+        const scrollLayer = document.getElementById('ui-scroll-layer');
+        const wrapper = document.getElementById('space-portfolio-wrapper');
+        
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x020205, 0.0015);
+
+        // Calculate dimensions based on our wrapper, not the whole window
+        let width = wrapper.clientWidth;
+        let height = wrapper.clientHeight;
+
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 2000);
+        camera.position.z = 100;
+        camera.position.y = 20;
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // --- GALAXY GENERATION ---
+        const parameters = { count: 10000, size: 0.15, radius: 300, branches: 4, spin: 1, randomness: 0.5, randomnessPower: 3, insideColor: '#00f2fe', outsideColor: '#020205' };
+        let geometry = null, material = null, points = null;
+
+        const generateGalaxy = () => {
+            geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(parameters.count * 3);
+            const colors = new Float32Array(parameters.count * 3);
+            const colorInside = new THREE.Color(parameters.insideColor);
+            const colorOutside = new THREE.Color(parameters.outsideColor);
+
+            for(let i = 0; i < parameters.count; i++) {
+                const i3 = i * 3;
+                const radius = Math.random() * parameters.radius;
+                const spinAngle = radius * parameters.spin;
+                const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2;
+                const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius;
+                const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius;
+                const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : - 1) * parameters.randomness * radius;
+
+                positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+                positions[i3 + 1] = randomY;
+                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+
+                const mixedColor = colorInside.clone();
+                mixedColor.lerp(colorOutside, radius / parameters.radius);
+                colors[i3] = mixedColor.r;
+                colors[i3 + 1] = mixedColor.g;
+                colors[i3 + 2] = mixedColor.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            material = new THREE.PointsMaterial({ size: parameters.size, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexColors: true });
+            points = new THREE.Points(geometry, material);
+            points.rotation.x = 0.5;
+            scene.add(points);
+        };
+        generateGalaxy();
+
+        // --- BACKGROUND STARS ---
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = new Float32Array(3000 * 3);
+        for(let i=0; i<3000*3; i++) starPos[i] = (Math.random() - 0.5) * 1000;
+        starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starMat = new THREE.PointsMaterial({color: 0xffffff, size: 0.5, transparent: true, opacity: 0.8});
+        scene.add(new THREE.Points(starGeo, starMat));
+
+        // --- SCROLL & MOUSE INTERACTION ---
+        let scrollY = 0, mouseX = 0, mouseY = 0;
+        scrollLayer.addEventListener('scroll', () => scrollY = scrollLayer.scrollTop);
+        wrapper.addEventListener('mousemove', (event) => {
+            const rect = wrapper.getBoundingClientRect();
+            mouseX = ((event.clientX - rect.left) / width) - 0.5;
+            mouseY = ((event.clientY - rect.top) / height) - 0.5;
+        });
+
+        // --- ANIMATION LOOP ---
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            if(points) points.rotation.y = clock.getElapsedTime() * 0.05;
+            
+            // Camera Fly-Through
+            camera.position.z += ((100 - (scrollY * 0.05)) - camera.position.z) * 0.1;
+            camera.position.x += (mouseX * 20 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 20 + 20 - camera.position.y) * 0.05;
+
+            camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+
+        // --- RESPONSIVE DESIGN ---
+        window.addEventListener('resize', () => {
+            width = wrapper.clientWidth;
+            height = wrapper.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+
+        animate();
+    });
+</script>
+{% endblock body %}

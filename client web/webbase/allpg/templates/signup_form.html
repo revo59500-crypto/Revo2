@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup | REVO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #0f1016;
+            --surface: rgba(26, 27, 38, 0.6);
+            --primary: #00f0ff;
+            --secondary: #b026ff;
+            --text-main: #ffffff;
+            --text-muted: #8b949e;
+            --gradient: linear-gradient(135deg, var(--secondary), var(--primary));
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 2rem 0;
+            background-image: radial-gradient(circle at 85% 50%, rgba(0, 240, 255, 0.08), transparent 40%),
+                              radial-gradient(circle at 15% 30%, rgba(176, 38, 255, 0.08), transparent 40%);
+        }
+
+        .auth-card {
+            background-color: var(--surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 3.5rem 3rem;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .brand { font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--text-main); letter-spacing: -1px; }
+        .brand span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        h1 { font-weight: 700; font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--text-main); }
+        p.subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem; }
+
+        .input-group { margin-bottom: 1.2rem; text-align: left; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        input {
+            width: 100%; background-color: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 1.2rem; border-radius: 12px; color: var(--text-main); font-size: 1rem; outline: none;
+            transition: all 0.3s ease;
+        }
+        input:focus { border-color: var(--secondary); box-shadow: 0 0 15px rgba(176, 38, 255, 0.15); }
+
+        /* Strength meter (JS disabled now) */
+        .strength-meter { display: flex; gap: 5px; margin-top: 8px; }
+        .strength-bar { height: 4px; flex-grow: 1; border-radius: 2px; background: rgba(255,255,255,0.1); }
+
+        button {
+            width: 100%; background: var(--gradient); color: #fff; border: none; padding: 1.2rem; margin-top: 1rem;
+            border-radius: 12px; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.3s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 240, 255, 0.3); }
+        button:active { transform: translateY(0); }
+
+        .switch-page { margin-top: 2rem; color: var(--text-muted); font-size: 0.95rem; }
+        .switch-page a { color: var(--text-main); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--secondary); padding-bottom: 2px; transition: color 0.3s; }
+        .switch-page a:hover { color: var(--secondary); }
+
+        .errorlist { color: #ff3366; font-size: 0.85rem; margin-top: 0.5rem; list-style: none; }
+        .errorlist li { margin-bottom: 0.25rem; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <div class="brand">REVO</div>
+        <h1>Create Account</h1>
+        <p class="subtitle">Join the mission</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="input-group">
+                <label>{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}{{ form.username.errors }}{% endif %}
+            </div>
+
+            <div class="input-group">
+                <label>{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}{{ form.email.errors }}{% endif %}
+            </div>
+            
+            <div class="input-group">
+                <label>{{ form.password1.label }}</label>
+                {{ form.password1 }}
+                <div class="strength-meter">
+                    <div class="strength-bar"></div>
+                    <div class="strength-bar"></div>
+                    <div class="strength-bar"></div>
+                </div>
+                {% if form.password1.errors %}{{ form.password1.errors }}{% endif %}
+            </div>
+
+            <div class="input-group">
+                <label>{{ form.password2.label }}</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}{{ form.password2.errors }}{% endif %}
+            </div>
+
+            <button type="submit">Create Account</button>
+        </form>
+
+        <div class="switch-page">
+            Existing operator? <a href="/login.html">Return to Login</a>
+        </div>
+    </div>
+
+</body>
+</html>

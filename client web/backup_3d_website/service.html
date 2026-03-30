@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% block title %}Architectures - REVO{% endblock title %}
+
+{% block body %}
+<style>
+    /* --- BLACK HOLE UI STYLES --- */
+
+    #blackhole-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .services-viewport {
+        position: relative;
+        z-index: 1;
+        padding: 6rem 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* Typography - Intense Glow for Event Horizon */
+    .text-revo-cyan { color: #00f2fe; }
+    .text-revo-gradient {
+        background: linear-gradient(135deg, #ffffff 0%, #00f2fe 50%, #4facfe 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        letter-spacing: 3px;
+        text-shadow: 0 0 30px rgba(0, 242, 254, 0.4);
+    }
+
+    /* CSS Grid Layout */
+    .revo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 2.5rem;
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* 3D Tilt Card Base - Darker to contrast the bright black hole */
+    .revo-service-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        perspective: 1000px; 
+    }
+
+    .revo-glass-card {
+        background: rgba(5, 5, 8, 0.7); /* Much darker for space depth */
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 242, 254, 0.1);
+        border-top: 1px solid rgba(0, 242, 254, 0.4);
+        border-left: 1px solid rgba(0, 242, 254, 0.4);
+        border-radius: 24px;
+        padding: 3rem 2rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 242, 254, 0.05);
+    }
+
+    /* Glare effect */
+    .glare-element {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15), transparent 50%);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        transform: translateZ(1px);
+    }
+
+    /* Hover States - Intense Gravitational Pull */
+    .revo-service-link:hover .revo-glass-card {
+        border-color: rgba(0, 242, 254, 0.8);
+        box-shadow: 0 20px 60px rgba(0, 242, 254, 0.2), inset 0 0 30px rgba(0, 242, 254, 0.1);
+    }
+    .revo-service-link:hover .glare-element { opacity: 1; }
+
+    /* Card Content Parallax */
+    .card-content {
+        transform: translateZ(60px); 
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .service-icon {
+        font-size: 3rem;
+        color: #00f2fe;
+        margin-bottom: 1.5rem;
+        filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.6));
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .revo-service-link:hover .service-icon {
+        transform: scale(1.15) rotate(-10deg);
+    }
+
+    /* WebGL Card Exception (Purple Shift) */
+    .webgl-card {
+        border-color: rgba(183, 100, 255, 0.2);
+        border-top-color: rgba(183, 100, 255, 0.5);
+        border-left-color: rgba(183, 100, 255, 0.5);
+    }
+    .revo-service-link:hover .webgl-card {
+        border-color: #b764ff;
+        box-shadow: 0 20px 60px rgba(183, 100, 255, 0.2), inset 0 0 30px rgba(183, 100, 255, 0.1);
+    }
+    .webgl-card .service-icon {
+        color: #b764ff;
+        filter: drop-shadow(0 0 15px rgba(183, 100, 255, 0.6));
+    }
+
+    /* Process Section */
+    .protocol-step {
+        background: rgba(15, 15, 20, 0.5);
+        border-left: 4px solid #00f2fe;
+        padding: 2rem;
+        border-radius: 0 20px 20px 0;
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .protocol-number {
+        position: absolute;
+        top: -20px;
+        right: 20px;
+        font-size: 4rem;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.05);
+    }
+</style>
+
+<div id="blackhole-canvas"></div>
+
+<div class="services-viewport">
+    <div class="container text-center mb-5 pb-4">
+        <h6 class="text-revo-cyan letter-spacing-2 mb-2"><i class="fas fa-satellite-dish me-2"></i> ENTER THE EVENT HORIZON</h6>
+        <h1 class="display-3 text-revo-gradient mb-4">Digital Architectures</h1>
+        <p class="lead text-light opacity-75 mx-auto" style="max-width: 700px;">
+            The gravity of our code pulls your users in and doesn't let go. Select an architecture module below to begin deployment.
+        </p>
+    </div>
+
+    <div class="revo-grid mb-5 pb-5">
+        
+        <a href="/services/single-page/" class="revo-service-link tilt-wrapper">
+            <div class="revo-glass-card tilt-element">
+                <div class="glare-element"></div>
+                <div class="card-content">
+                    <i class="fas fa-layer-group service-icon"></i>
+                    <h3 class="text-white fw-bold mb-3">Single-Page Apps</h3>
+                    <p class="text-light opacity-75 mb-4">
+                        Fluid, continuous-scroll experiences without page reloads. We construct highly interactive SPA environments optimized for maximum user retention and seamless data fetching.
+                    </p>
+                    <div class="learn-more-btn mt-auto font-monospace text-revo-cyan">
+                        [ INITIATE MODULE ] <i class="fas fa-arrow-right ms-2"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a href="/services/static/" class="revo-service-link tilt-wrapper">
+            <div class="revo-glass-card tilt-element">
+                <div class="glare-element"></div>
+                <div class="card-content">
+                    <i class="fas fa-bolt service-icon"></i>
+                    <h3 class="text-white fw-bold mb-3">Static Ecosystems</h3>
+                    <p class="text-light opacity-75 mb-4">
+                        Blazing fast, pre-rendered architecture. Offering unmatched security, perfect SEO lighthouse scores, and instant load times. The ultimate solution for corporate profiles.
+                    </p>
+                    <div class="learn-more-btn mt-auto font-monospace text-revo-cyan">
+                        [ INITIATE MODULE ] <i class="fas fa-arrow-right ms-2"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a href="/services/multi-page/" class="revo-service-link tilt-wrapper">
+            <div class="revo-glass-card tilt-element">
+                <div class="glare-element"></div>
+                <div class="card-content">
+                    <i class="fas fa-network-wired service-icon"></i>
+                    <h3 class="text-white fw-bold mb-3">Multi-Page Hubs</h3>
+                    <p class="text-light opacity-75 mb-4">
+                        Infinitely scalable digital hubs. Featuring complex routing protocols, dynamic database integrations, and robust backend structures designed for enterprise-level scaling.
+                    </p>
+                    <div class="learn-more-btn mt-auto font-monospace text-revo-cyan">
+                        [ INITIATE MODULE ] <i class="fas fa-arrow-right ms-2"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a href="/services/webgl/" class="revo-service-link tilt-wrapper">
+            <div class="revo-glass-card tilt-element webgl-card">
+                <div class="glare-element"></div>
+                <div class="card-content">
+                    <i class="fas fa-cube service-icon"></i>
+                    <h3 class="text-white fw-bold mb-3">WebGL / 3D Design</h3>
+                    <p class="text-light opacity-75 mb-4">
+                        Antigravity digital environments. We leverage WebGL math arrays to construct interactive, fully immersive 3D worlds directly in the browser, transcending standard 2D screens.
+                    </p>
+                    <div class="learn-more-btn mt-auto font-monospace" style="color: #b764ff;">
+                        [ INITIATE MODULE ] <i class="fas fa-arrow-right ms-2"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+        <a href="/services/chatbot.html" class="revo-service-link tilt-wrapper">
+            <div class="revo-glass-card tilt-element">
+                <div class="glare-element"></div>
+                <div class="card-content">
+                    <i class="fas fa-robot service-icon"></i>
+                    <h3 class="text-white fw-bold mb-3">AI & Chatbots</h3>
+                    <p class="text-light opacity-75 mb-4">
+                        Sentient digital agents. We integrate advanced conversational AI and LLM-powered chatbots to automate interactions, scale your support protocols, and keep users engaged 24/7.
+                    </p>
+                    <div class="learn-more-btn mt-auto font-monospace text-revo-cyan">
+                        [ INITIATE MODULE ] <i class="fas fa-arrow-right ms-2"></i>
+                    </div>
+                </div>
+            </div>
+        </a>
+        </div> <div class="container mt-5 pt-5 border-top" style="border-color: rgba(255,255,255,0.05) !important;">
+        <div class="row mb-5 text-center">
+            <div class="col-12">
+                <h2 class="display-5 text-white fw-bold">Deployment Protocol</h2>
+                <p class="text-light opacity-50">How we turn a concept into a digital singularity.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="protocol-step h-100">
+                    <span class="protocol-number">01</span>
+                    <h4 class="text-revo-cyan mb-3">Telemetry & Scope</h4>
+                    <p class="text-light opacity-75 mb-0">We calculate the exact trajectory of your brand. Understanding your target audience, required features, and setting the mathematical foundation for the project.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="protocol-step h-100" style="border-color: #4facfe;">
+                    <span class="protocol-number">02</span>
+                    <h4 class="text-white mb-3" style="color: #4facfe !important;">Architecture Setup</h4>
+                    <p class="text-light opacity-75 mb-0">Our engineers begin constructing the wireframes and logic. Code is written with absolute precision to ensure zero latency and maximum visual impact.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="protocol-step h-100" style="border-color: #b764ff;">
+                    <span class="protocol-number">03</span>
+                    <h4 class="mb-3" style="color: #b764ff;">Horizon Crossing</h4>
+                    <p class="text-light opacity-75 mb-0">The final phase. Rigorous bug-testing across all devices, server configuration, and the ultimate launch of your new digital ecosystem into the wild.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // --- 1. THREE.JS BLACK HOLE ENGINE ---
+        const container = document.getElementById('blackhole-canvas');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.001); // Fade to pure black in distance
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.position.z = 400; // Looking down the tunnel
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // Particle System variables
+        const particleCount = 4000;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const velocities = [];
+
+        // Generate a cylinder/vortex of particles
+        for (let i = 0; i < particleCount; i++) {
+            const i3 = i * 3;
+            const angle = Math.random() * Math.PI * 2;
+            const radius = 50 + Math.random() * 300; // Hole in the middle (event horizon)
+            const z = (Math.random() - 0.5) * 2000;
+
+            positions[i3] = Math.cos(angle) * radius;
+            positions[i3 + 1] = Math.sin(angle) * radius;
+            positions[i3 + 2] = z;
+
+            // Give them a speed to fly towards the camera
+            velocities.push(Math.random() * 2 + 1); 
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        // Subtle blue/purple material for the stars
+        const material = new THREE.PointsMaterial({
+            color: 0x4facfe,
+            size: 1.5,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+
+        // Animation Loop
+        let scrollY = window.scrollY;
+        window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+        function animateBlackHole() {
+            requestAnimationFrame(animateBlackHole);
+
+            // Rotate the entire vortex
+            particles.rotation.z -= 0.002;
+
+            // Move particles toward the camera to simulate falling in
+            const positionsArr = particles.geometry.attributes.position.array;
+            
+            // The scroll multiplier makes the "suction" faster when the user scrolls down
+            const speedMultiplier = 1 + (scrollY * 0.005); 
+
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                positionsArr[i3 + 2] += velocities[i] * speedMultiplier;
+
+                // If particle passes behind camera, reset it deep into the black hole
+                if (positionsArr[i3 + 2] > 500) {
+                    positionsArr[i3 + 2] = -1500;
+                }
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle Resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animateBlackHole();
+
+        // --- 2. VANILLA JS 3D TILT PHYSICS (PC ONLY) ---
+        const tiltWrappers = document.querySelectorAll('.tilt-wrapper');
+        const isHoverSupported = window.matchMedia('(hover: hover)').matches;
+
+        if (isHoverSupported) {
+            tiltWrappers.forEach(wrapper => {
+                const element = wrapper.querySelector('.tilt-element');
+                const glare = wrapper.querySelector('.glare-element');
+
+                wrapper.addEventListener('mousemove', (e) => {
+                    const rect = wrapper.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const xPct = (x / rect.width) - 0.5;
+                    const yPct = (y / rect.height) - 0.5;
+                    const rotateX = yPct * -20; 
+                    const rotateY = xPct * 20;
+
+                    element.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                    glare.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.2), transparent 60%)`;
+                });
+
+                wrapper.addEventListener('mouseleave', () => {
+                    element.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                    element.style.transition = `transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+                    setTimeout(() => { element.style.transition = `border-color 0.3s ease, box-shadow 0.3s ease`; }, 500);
+                });
+
+                wrapper.addEventListener('mouseenter', () => {
+                     element.style.transition = `border-color 0.3s ease, box-shadow 0.3s ease`;
+                });
+            });
+        }
+    });
+</script>
+{% endblock body %}

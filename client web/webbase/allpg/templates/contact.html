@@ -1,0 +1,432 @@
+{% extends "base.html" %}
+{% block title %}Establish Contact - REVO{% endblock title %}
+
+{% block body %}
+<style>
+    /* --- CONTACT RELAY SCOPED STYLES --- */
+
+    #contact-universe {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        pointer-events: none; /* Let user click the UI */
+    }
+
+    /* Force the page to act like a single viewport dashboard */
+    .contact-viewport {
+        position: relative;
+        z-index: 1;
+        min-height: calc(100vh - 80px); /* Account for navbar */
+        display: flex;
+        align-items: center;
+        padding: 4rem 0;
+    }
+
+    /* Holographic Terminal Styling */
+    .revo-terminal {
+        background: rgba(8, 8, 12, 0.6);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        border-top: 1px solid rgba(0, 242, 254, 0.5);
+        border-left: 1px solid rgba(0, 242, 254, 0.5);
+        border-radius: 24px;
+        padding: 3rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(0, 242, 254, 0.05);
+        transition: all 0.5s ease;
+    }
+
+    .text-revo-cyan { color: #00f2fe; }
+    .text-revo-gradient {
+        background: linear-gradient(135deg, #ffffff 0%, #00f2fe 50%, #4facfe 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        letter-spacing: 2px;
+    }
+
+    /* Custom Form Controls */
+    .revo-input {
+        background: rgba(0, 242, 254, 0.05);
+        border: 1px solid rgba(0, 242, 254, 0.2);
+        color: #fff;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .revo-input:focus {
+        background: rgba(0, 242, 254, 0.1);
+        border-color: #00f2fe;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        color: #fff;
+        outline: none;
+    }
+
+    .revo-input::placeholder {
+        color: rgba(255, 255, 255, 0.3);
+        font-family: monospace;
+    }
+
+    .revo-btn {
+        background: transparent;
+        color: #00f2fe;
+        border: 2px solid #00f2fe;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.4s ease;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .revo-btn:hover {
+        background: #00f2fe;
+        color: #020205;
+        box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
+    }
+
+    /* Success Hologram UI */
+    #success-hologram {
+        display: none;
+        text-align: center;
+        animation: hologramFlicker 2s infinite alternate;
+    }
+
+    @keyframes hologramFlicker {
+        0% { opacity: 0.8; text-shadow: 0 0 10px #00f2fe; }
+        100% { opacity: 1; text-shadow: 0 0 30px #00f2fe, 0 0 50px #00f2fe; }
+    }
+
+    /* Target UI overlay for the asteroid */
+    .target-overlay {
+        position: absolute;
+        top: 20%;
+        right: 15%;
+        width: 150px;
+        height: 150px;
+        border: 1px dashed rgba(0, 242, 254, 0.3);
+        border-radius: 50%;
+        animation: spin 10s linear infinite;
+        pointer-events: none;
+        display: none; /* Revealed during transmission */
+    }
+
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    
+    @media (max-width: 768px) {
+        .revo-terminal { padding: 2rem 1.5rem; }
+        .contact-viewport { align-items: flex-start; padding-top: 2rem; }
+    }
+</style>
+
+<div id="contact-universe"></div>
+
+<div class="contact-viewport">
+    <div class="container">
+        <div class="row align-items-center">
+            
+            <div class="col-lg-5 mb-5 mb-lg-0 pe-lg-5 text-center text-lg-start" id="lore-section">
+                <h6 class="text-revo-cyan letter-spacing-2 mb-3"><i class="fas fa-satellite-dish me-2"></i> OPEN CHANNEL</h6>
+                <h1 class="display-4 text-revo-gradient mb-4">Establish Contact</h1>
+                <p class="lead text-light opacity-75 mb-4">
+                    Ready to engineer your digital universe? Load your project telemetry into the asteroid payload. Our command center is standing by to receive the transmission.
+                </p>
+                <div class="d-flex flex-column gap-3 mt-5">
+                    <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                        <div class="bg-dark rounded-circle p-3 border border-info me-3">
+                            <i class="fas fa-map-marker-alt text-revo-cyan fa-lg"></i>
+                        </div>
+                        <span class="text-light opacity-75 font-monospace">Sector: Patna, Bihar [HQ]</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center justify-content-lg-start">
+                        <div class="bg-dark rounded-circle p-3 border border-info me-3">
+                            <i class="fas fa-envelope text-revo-cyan fa-lg"></i>
+                        </div>
+                        <span class="text-light opacity-75 font-monospace">buylappy09@gmail.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 offset-lg-1">
+                <div class="revo-terminal" id="terminal-interface">
+                    
+                    <form id="revo-transmission-form">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="form-label text-revo-cyan font-monospace small">CLIENT DESIGNATION</label>
+                            <input type="text" class="form-control revo-input" placeholder="Enter your name or agency..." required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-revo-cyan font-monospace small">COMLINK FREQUENCY</label>
+                            <input type="email" class="form-control revo-input" placeholder="Enter return email address..." required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-revo-cyan font-monospace small">DATA PAYLOAD (PROJECT DETAILS)</label>
+                            <textarea class="form-control revo-input" rows="4" placeholder="Describe the architecture you wish to build..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn revo-btn" id="launch-btn">
+                            <i class="fas fa-meteor me-2"></i> Launch Transmission
+                        </button>
+                    </form>
+
+                    <div id="success-hologram" class="py-5">
+                        <i class="fas fa-check-circle fa-4x text-revo-cyan mb-4"></i>
+                        <h2 class="text-white fw-bold mb-3">Transmission Successful</h2>
+                        <p class="text-light opacity-75 font-monospace">Data payload has impacted REVO Command Center. Our engineers are analyzing the telemetry and will open a return channel shortly.</p>
+                        <button onclick="location.reload()" class="btn revo-btn mt-4" style="font-size: 0.8rem; padding: 0.5rem 1rem;">Initialize New Payload</button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="target-overlay" id="target-lock"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // --- 1. CORE SCENE SETUP ---
+        const container = document.getElementById('contact-universe');
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x020205, 0.003);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 50);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // --- 2. LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
+        
+        const pointLight = new THREE.PointLight(0x00f2fe, 2, 200);
+        pointLight.position.set(-20, 20, 20);
+        scene.add(pointLight);
+
+        // --- 3. THE PLANET (REVO Command Center) ---
+        // Positioned in the distance, to the left
+        const planetGeo = new THREE.SphereGeometry(15, 32, 32);
+        const planetMat = new THREE.MeshStandardMaterial({
+            color: 0x002244,
+            emissive: 0x001133,
+            wireframe: true, // Gives it that digital/architect vibe
+            transparent: true,
+            opacity: 0.8
+        });
+        const planet = new THREE.Mesh(planetGeo, planetMat);
+        
+        // Responsive positioning: Move it depending on screen size
+        if(window.innerWidth > 992) {
+            planet.position.set(-25, 5, -50); 
+        } else {
+            planet.position.set(0, 25, -60); // Move up on mobile so it's not hidden by form
+        }
+        scene.add(planet);
+
+        // Planet Atmosphere Glow
+        const atmosGeo = new THREE.SphereGeometry(16, 32, 32);
+        const atmosMat = new THREE.MeshBasicMaterial({
+            color: 0x00f2fe,
+            transparent: true,
+            opacity: 0.1,
+            blending: THREE.AdditiveBlending
+        });
+        const atmosphere = new THREE.Mesh(atmosGeo, atmosMat);
+        planet.add(atmosphere);
+
+        // --- 4. THE ASTEROID (Client Data Payload) ---
+        // Positioned close to the camera, to the right
+        const asteroidGeo = new THREE.IcosahedronGeometry(4, 1);
+        
+        // Math to make the Icosahedron look jagged and rocky
+        const posAttribute = asteroidGeo.attributes.position;
+        for (let i = 0; i < posAttribute.count; i++) {
+            posAttribute.setXYZ(
+                i,
+                posAttribute.getX(i) + (Math.random() - 0.5) * 1.5,
+                posAttribute.getY(i) + (Math.random() - 0.5) * 1.5,
+                posAttribute.getZ(i) + (Math.random() - 0.5) * 1.5
+            );
+        }
+        asteroidGeo.computeVertexNormals();
+
+        const asteroidMat = new THREE.MeshStandardMaterial({
+            color: 0x555555,
+            roughness: 0.9,
+            metalness: 0.1,
+            flatShading: true // Low-poly tech look
+        });
+        const asteroid = new THREE.Mesh(asteroidGeo, asteroidMat);
+        
+        if(window.innerWidth > 992) {
+            asteroid.position.set(20, -10, 20);
+        } else {
+            asteroid.position.set(0, -25, 10); // Move down on mobile
+        }
+        scene.add(asteroid);
+
+        // --- 5. BACKGROUND STARS ---
+        const starsGeo = new THREE.BufferGeometry();
+        const starsPos = new Float32Array(2000 * 3);
+        for(let i=0; i<2000*3; i++) {
+            starsPos[i] = (Math.random() - 0.5) * 400;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starsPos, 3));
+        const starsMat = new THREE.PointsMaterial({color: 0xffffff, size: 0.5, transparent: true, opacity: 0.5});
+        const starField = new THREE.Points(starsGeo, starsMat);
+        scene.add(starField);
+
+        // --- 6. EXPLOSION PARTICLE SYSTEM (Hidden initially) ---
+        let explosionParticles;
+        function createExplosion(impactPoint) {
+            const expGeo = new THREE.BufferGeometry();
+            const expCount = 500;
+            const expPos = new Float32Array(expCount * 3);
+            const expVel = []; // Velocities to make them fly outward
+
+            for(let i=0; i<expCount; i++) {
+                const i3 = i * 3;
+                expPos[i3] = impactPoint.x;
+                expPos[i3+1] = impactPoint.y;
+                expPos[i3+2] = impactPoint.z;
+
+                // Random spherical velocities
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos((Math.random() * 2) - 1);
+                const speed = Math.random() * 2;
+
+                expVel.push({
+                    x: Math.sin(phi) * Math.cos(theta) * speed,
+                    y: Math.sin(phi) * Math.sin(theta) * speed,
+                    z: Math.cos(phi) * speed
+                });
+            }
+
+            expGeo.setAttribute('position', new THREE.BufferAttribute(expPos, 3));
+            const expMat = new THREE.PointsMaterial({
+                color: 0x00f2fe,
+                size: 1.5,
+                blending: THREE.AdditiveBlending,
+                transparent: true
+            });
+
+            explosionParticles = new THREE.Points(expGeo, expMat);
+            explosionParticles.userData = { velocities: expVel };
+            scene.add(explosionParticles);
+        }
+
+        // --- 7. ANIMATION STATE LOGIC ---
+        let isTransmitting = false;
+        let hasImpacted = false;
+
+        const form = document.getElementById('revo-transmission-form');
+        const btn = document.getElementById('launch-btn');
+        const targetLock = document.getElementById('target-lock');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); // Stop page reload
+            
+            // UI Updates
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Transmitting...';
+            btn.classList.add('disabled');
+            targetLock.style.display = 'block'; // Show CSS target reticle
+
+            // Trigger 3D Physics
+            isTransmitting = true;
+
+            // TODO: Add your actual AJAX/Fetch POST request to Django here
+            // fetch('/contact/', { method: 'POST', body: new FormData(form) })
+        });
+
+        function triggerSuccessUI() {
+            targetLock.style.display = 'none';
+            form.style.display = 'none';
+            document.getElementById('lore-section').style.opacity = '0.2'; // Dim background lore
+            document.getElementById('success-hologram').style.display = 'block';
+        }
+
+        // --- 8. RENDER LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Idle Animations
+            planet.rotation.y += 0.002;
+            planet.rotation.x += 0.001;
+            
+            if (!isTransmitting && !hasImpacted) {
+                asteroid.rotation.x += 0.01;
+                asteroid.rotation.y += 0.02;
+                // Gentle floating
+                asteroid.position.y += Math.sin(Date.now() * 0.001) * 0.02;
+            }
+
+            starField.rotation.y += 0.0005;
+
+            // Transmission Animation (Asteroid flying to planet)
+            if (isTransmitting && !hasImpacted) {
+                // Lerp creates a smooth acceleration/deceleration curve
+                asteroid.position.lerp(planet.position, 0.03);
+                asteroid.rotation.x += 0.1; // Spin faster
+                asteroid.rotation.y += 0.1;
+
+                // Check distance for impact
+                const distance = asteroid.position.distanceTo(planet.position);
+                if (distance < 16) { // Planet radius is 15
+                    hasImpacted = true;
+                    isTransmitting = false;
+                    
+                    // Remove asteroid and trigger explosion
+                    scene.remove(asteroid);
+                    createExplosion(planet.position);
+                    
+                    // Trigger HTML UI update
+                    triggerSuccessUI();
+                }
+            }
+
+            // Explosion Animation
+            if (hasImpacted && explosionParticles) {
+                const positions = explosionParticles.geometry.attributes.position.array;
+                const vels = explosionParticles.userData.velocities;
+                
+                let opacityFade = explosionParticles.material.opacity;
+                if (opacityFade > 0) {
+                    explosionParticles.material.opacity -= 0.01;
+                }
+
+                for(let i=0; i<500; i++) {
+                    const i3 = i*3;
+                    positions[i3] += vels[i].x;
+                    positions[i3+1] += vels[i].y;
+                    positions[i3+2] += vels[i].z;
+                }
+                explosionParticles.geometry.attributes.position.needsUpdate = true;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Responsive handling
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate();
+    });
+</script>
+{% endblock body %}
