@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g+#!)!1ort!hrt%jgtp83x+qkir$m)vuo)6s3&in9&vn6xk^2i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0', 'twana-maniform-nenita.ngrok-free.dev', '*.ngrok-free.dev']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '0.0.0.0', 'twana-maniform-nenita.ngrok-free.dev', '*.ngrok-free.dev', '.vercel.app', '.now.sh']
 
 
 # Application definition
@@ -116,3 +116,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
