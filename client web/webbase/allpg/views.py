@@ -119,7 +119,10 @@ def singlepg(request):
 def staticpg(request):
     return render(request, 'staticpg.html')
 
-def multipg(request):\n    return render(request, 'multipg.html')\n\ndef multiplepg(request):\n    return render(request, 'multipg.html')
+def multipg(request):
+        return render(request, 'multipg.html')
+def multiplepg(request):
+    return render(request, 'multipg.html')
 
 def threedpg(request):
     return render(request, '3d design.html')
