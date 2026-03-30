@@ -1,0 +1,22 @@
+{
+  "builds": [
+    {
+      "src": "client web/webbase/webbase/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.12"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/client web/webbase/staticfiles/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "client web/webbase/webbase/wsgi.py"
+    }
+  ]
+}

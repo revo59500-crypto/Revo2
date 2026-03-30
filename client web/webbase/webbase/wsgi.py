@@ -12,10 +12,14 @@ import sys
 
 from django.core.wsgi import get_wsgi_application
 
-# Add the project directory to the sys.path
-path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if path not in sys.path:
-    sys.path.append(path)
+# Add the project directory and parent directories to the sys.path
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.dirname(current_dir)
+root_dir = os.path.dirname(os.path.dirname(project_dir))
+
+for path in [current_dir, project_dir, root_dir]:
+    if path not in sys.path:
+        sys.path.insert(0, path)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'webbase.settings')
 
